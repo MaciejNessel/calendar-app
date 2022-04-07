@@ -1,3 +1,5 @@
+import json
+from JsonEncoder import JsonEncoder
 
 
 class Note:
@@ -25,5 +27,6 @@ class Note:
         self.__id = id_
 
     def to_json(self):
-        pass
-        # TODO json_manager.save(this)
+        return json.dumps(self, cls=JsonEncoder, indent=2)
+
+

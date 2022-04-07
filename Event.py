@@ -1,64 +1,51 @@
-
-
-
-####        Event
+import json
+from JsonEncoder import JsonEncoder
 
 class Event:
-    _title = ""
-    _shortDesc = ""
-    _desc = ""
-    _id = -1
-    _noteId = -1
-    
-    def __init__(self, title, shortDesc, desc, id, noteId):
-        self._title = title
-        self._shortDesc = shortDesc
-        self._desc = desc
-        self._id = id
-        self._notesId = []
+    def __init__(self, title, short_desc, desc, id_, notes_id):
+        self.__title = title
+        self.__short_desc = short_desc
+        self.__desc = desc
+        self.__id_ = id_
+        self.__notes_id = notes_id
 
-    #Return Event object in Json format
-    def toJSON(self):
-        return []
+    # Return Event object in Json format
+    def to_json(self):
+        return json.dumps(self, cls=JsonEncoder, indent=2)
 
-    #Getters to all Atributes
+    # Getters to all Attributes
 
-    def getTitle(self):
-        return self._title
+    def get_title(self):
+        return self.__title
 
-    def getShortDesc(self):
-        return self._shortDesc
+    def get_short_desc(self):
+        return self.__short_desc
 
-    def getDesc(self):
-        return self._desc
+    def get_desc(self):
+        return self.__desc
 
-    def getId(self):
-        return self._id
+    def get_id(self):
+        return self.__id_
 
-    def getNotesId(self):
-        return self._notesId
+    def get_notes_id(self):
+        return self.__notes_id
 
-    #Setter to _title
+    # Setter to __title
+    def set_title(self, title):
+        self.__title = title
 
-    def setTitle(self, title):
-        self._title = title
+    # Setter to __shortDesc
+    def set_short_desc(self, short_desc):
+        self.__short_desc = short_desc
 
-    #Setter to _shortDesc
+    # Setter to __desc
+    def set_desc(self, desc):
+        self.__desc = desc
 
-    def setShortDesc(self, shortDesc):
-        self._shortDesc = shortDesc
-    
-    #Setter to _desc
+    # Add note of Id to __notes_id(Event)
+    def addNote(self, note_id):
+        self.__notes_id.append(note_id)
 
-    def setDesc(self, desc):
-        self._desc = desc
-
-    #Add note of Id to _notesId(Event)
-
-    def addNote(self, noteId):
-        self._notesId.append(noteId)
-
-    #Remove note of Id from _notesId(Event)
-
-    def removeNote(self, noteId):
-        self._notesId.remove(noteId)
+    # Remove note of Id from __notes_id(Event)
+    def removeNote(self, note_id):
+        self.__notes_id.remove(note_id)

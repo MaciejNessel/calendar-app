@@ -1,6 +1,7 @@
 from Event import Event
 from Note import Note
-
+import json
+from JsonEncoder import JsonEncoder
 
 class Day:
     def __init__(self, date, events_, notes):
@@ -33,5 +34,4 @@ class Day:
         return self.__notes
 
     def to_json(self):
-        pass
-        # TODO json_manager.save_day(this)
+        return json.dumps(self, cls=JsonEncoder, indent=2)

@@ -1,44 +1,52 @@
 from Note import Note
+from JsonManager import JsonManager
+import json
 
 
 class NotesManager:
-    __notes = {}
-
     def __init__(self, json_manager):
+        self.__notes = {}
         self.__json_manager = json_manager
-        self.load_notes()
 
-    def load_notes(self):
-        try:
-            self.__notes = self.__json_manager.load_notes()
-        except AttributeError:
-            print("An exception occurred: (AttributeError) NotesManager load_notes()")
+    def load(self):
+        data = self.__json_manager.get_notes()
+        for note in data:
+            new_note = Note(note.get('title'), note.get('text'), note.get('id_'))
+            self.__notes.update({note.get('id_'): new_note})
 
-    def get_note(self, id_):
+    def get(self, id_):
         try:
             return self.__notes[id_]
         except KeyError:
             print("An exception occurred: (KeyError) NotesManager get_note()")
             return None
 
-    def add_note(self, note):
+    def add(self, note=None, title=None, text=None):
+        if note is None:
+            id_ = JsonManager.generate_id()
+            self.__notes[id_] = Note(title, text, id_)
+            return True
         try:
             if type(note) != Note:
                 raise AttributeError
             else:
                 self.__notes[note.get_id()] = note
+                return True
         except AttributeError:
             print("An exception occurred: (AttributeError) NotesManager add_note()")
+            return False
 
-    def delete_note(self, id_):
+    def delete(self, id_):
         try:
             del self.__notes[id_]
         except KeyError:
             print("An exception occurred: (KeyError) NotesManager delete_note()")
 
-    def reset_notes(self):
+    def reset(self):
         self.__notes.clear()
 
-    def save_changes(self):
-        for note in self.__notes:
-            note.to_json()
+    def save(self):
+        result = {"noteDetails": []}
+        for note in self.__notes.items():
+            result["noteDetails"].append((json.loads(note[1].to_json())))
+        return result
