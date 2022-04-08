@@ -1,5 +1,5 @@
-from Note import Note
-from JsonManager import JsonManager
+from App.Notes.Note import Note
+from App.Json.JsonManager import JsonManager
 import json
 
 

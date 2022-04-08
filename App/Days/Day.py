@@ -1,7 +1,7 @@
-from Event import Event
-from Note import Note
+from App.Events.Event import Event
+from App.Notes.Note import Note
 import json
-from JsonEncoder import JsonEncoder
+from App.Json.JsonEncoder import JsonEncoder
 
 class Day:
     def __init__(self, date, events_, notes):

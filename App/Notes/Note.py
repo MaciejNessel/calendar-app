@@ -1,5 +1,5 @@
 import json
-from JsonEncoder import JsonEncoder
+from App.Json.JsonEncoder import JsonEncoder
 
 
 class Note:

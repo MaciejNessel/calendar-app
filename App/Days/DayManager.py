@@ -1,5 +1,4 @@
-from Day import Day
-from JsonManager import JsonManager
+from App.Days.Day import Day
 import json
 
 class DayManager:

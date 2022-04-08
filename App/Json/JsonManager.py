@@ -16,14 +16,14 @@ class JsonManager:
     @staticmethod
     def get_users():
         try:
-            users_file = open("./users/users_list.json")
+            users_file = open("../../users/users_list.json")
             users_list = json.load(users_file)
             users_file.close()
             return users_list['users']
         except FileNotFoundError:
             print("File users_list.json doesn't exist!")
             json_object = json.dumps({"users": []})
-            with open("./users/users_list.json", "w") as outfile:
+            with open("../../users/users_list.json", "w") as outfile:
                 outfile.write(json_object)
             return []
 

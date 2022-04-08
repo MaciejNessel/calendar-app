@@ -1,5 +1,5 @@
-from Event import Event
-from JsonManager import JsonManager
+from App.Events.Event import Event
+from App.Json.JsonManager import JsonManager
 import json
 
 class EventsManager:

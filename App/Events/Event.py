@@ -1,5 +1,5 @@
 import json
-from JsonEncoder import JsonEncoder
+from App.Json.JsonEncoder import JsonEncoder
 
 class Event:
     def __init__(self, title, short_desc, desc, id_, notes_id):

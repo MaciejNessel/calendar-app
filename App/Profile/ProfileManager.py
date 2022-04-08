@@ -1,8 +1,7 @@
-from EventManager import EventsManager
-from NotesManager import NotesManager
-from DayManager import DayManager
-
-from JsonManager import JsonManager
+from App.Events.EventManager import EventsManager
+from App.Notes.NotesManager import NotesManager
+from App.Days.DayManager import DayManager
+from App.Json.JsonManager import JsonManager
 
 
 class ProfileManager:
@@ -22,7 +21,3 @@ class ProfileManager:
         self.event_manager.load()
         self.day_manager.load()
         self.note_manager.load()
-
-
-user = ProfileManager("user1")
-user.save_profile()
