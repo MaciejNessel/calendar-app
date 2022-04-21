@@ -15,11 +15,8 @@ class NotesManager:
             self.__notes.update({note.get('id_'): new_note})
 
     def get(self, id_):
-        try:
-            return self.__notes[id_]
-        except KeyError:
-            print("An exception occurred: (KeyError) NotesManager get_note()")
-            return None
+        result = self.__notes.get(id_)
+        return result
 
     def add(self, note=None, title=None, text=None):
         if note is None:

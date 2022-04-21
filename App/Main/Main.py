@@ -1,4 +1,5 @@
-from App.Profile.ProfileManager import ProfileManager
+from App.GUI.MyApp import MyApp
 
-user = ProfileManager("user1")
-user.save_profile()
+if __name__ == '__main__':
+    myapp = MyApp()
+    myapp.run()

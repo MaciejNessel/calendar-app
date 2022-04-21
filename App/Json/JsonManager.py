@@ -2,6 +2,7 @@ import json
 import uuid
 from shutil import copyfile
 
+
 class JsonManager:
     def __init__(self):
         self.__event_details = None
@@ -29,7 +30,7 @@ class JsonManager:
 
     def load_data(self, username):
         try:
-            user_file = open("./users/" + username + ".json")
+            user_file = open("../../users/" + username + ".json")
             user = json.load(user_file)
             user_file.close()
             self.__event_details = user['eventDetails']
@@ -42,6 +43,7 @@ class JsonManager:
             return False
         except KeyError:
             print("Bad user", username, " data file structure!")
+            return False
 
     def get_data_per_days(self):
         return self.__data_per_day
@@ -63,11 +65,37 @@ class JsonManager:
         days_json = day_manager.save()
         result.update(days_json)
 
-        copyfile('./users/'+self.__username+'.json', './users/old/'+self.__username+'.json')
+        copyfile('../../users/' + self.__username + '.json', '../../users/old/' + self.__username + '.json')
 
-        with open('./users/'+self.__username+'.json', 'w') as f:
+        with open('../../users/' + self.__username + '.json', 'w') as f:
             json.dump(result, f, indent=2)
 
+    @staticmethod
+    def create_new_user(username):
+        try:
+            users_file = open("../../users/users_list.json")
+            users_json = json.load(users_file)
+        except FileNotFoundError:
+            users_json = json.dumps({"users": []})
 
+        for user in users_json.get('users'):
+            if user.get('username') == username:
+                return [False, "User: " + username + " exist."]
 
+        users_json.get('users').append({
+            "username": username
+        })
+        copyfile('../../users/users_list.json', '../../users/old/users_list.json')
+        with open('../../users/users_list.json', 'w') as f:
+            json.dump(users_json, f, indent=2)
 
+        users_data = {
+            "username": username,
+            "eventDetails": [],
+            "noteDetails": [],
+            "dataPerDay": []
+        }
+        with open('../../users/' + username + '.json', 'w') as f:
+            json.dump(users_data, f, indent=2)
+
+        return [True, 'User added successfully.']
