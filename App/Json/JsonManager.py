@@ -99,3 +99,7 @@ class JsonManager:
             json.dump(users_data, f, indent=2)
 
         return [True, 'User added successfully.']
+
+    @staticmethod
+    def import_data(path, filename):
+        print(path, filename, "TODO!!")

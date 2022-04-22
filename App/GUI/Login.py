@@ -1,5 +1,6 @@
 from kivy.core.window import Window
 from kivy.factory import Factory
+from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -8,8 +9,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 
 from App.Json.JsonManager import JsonManager
-from App.GUI.Error import Error
-from App.GUI.Message import Message
+
 
 class NewUser(Popup):
     def __init__(self, app, **kw):
@@ -30,12 +30,15 @@ class NewUser(Popup):
         self.add_widget(layout)
 
     def add(self, text):
+        if text == '':
+            return
         result = self.app.json_manager.create_new_user(text)
         self.dismiss()
         if result[0]:
             Factory.Message(result[1]).open()
         else:
             Factory.Error(result[1]).open()
+
 
 class SelectUser(Popup):
     def __init__(self, app, **kw):
@@ -67,13 +70,26 @@ class SelectUser(Popup):
 
 
 class ImportData(Popup):
-    def __init__(self, **kw):
+    def __init__(self, app, **kw):
         super(ImportData, self).__init__(**kw)
+        self.app = app
         self.title = "Import data"
+        layout = GridLayout(cols=1)
+
+        file_chooser = FileChooserListView()
+        select_btn = Button(text='Select',
+                            on_release=lambda x: self.load(file_chooser.path, file_chooser.selection))
         back_btn = Button(text='Back',
                           on_release=lambda x: self.dismiss())
-        self.add_widget(back_btn)
 
+        layout.add_widget(file_chooser)
+        layout.add_widget(select_btn)
+        layout.add_widget(back_btn)
+
+        self.add_widget(layout)
+
+    def load(self, path, filename):
+        self.app.json_manager.import_data(path, filename)
 
 class Login(GridLayout):
     def __init__(self, app, **kw):
@@ -85,7 +101,7 @@ class Login(GridLayout):
         new_user_btn = Button(text='Add new user',
                               on_release=lambda x: Factory.NewUser(app).open())
         import_btn = Button(text='Import data from file',
-                            on_release=lambda x: Factory.ImportData().open())
+                            on_release=lambda x: Factory.ImportData(app).open())
 
         self.add_widget(select_user_btn)
         self.add_widget(new_user_btn)
