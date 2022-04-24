@@ -1,6 +1,5 @@
 from kivy.app import App
 from kivy.factory import Factory
-from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import ScreenManager, NoTransition, Screen
 
 from App.GUI.Login import Login
@@ -18,6 +17,7 @@ class MyApp(App):
         self.json_manager = JsonManager()
 
     def build(self):
+        #Window.clearcolor = (1, 1, 1, 1)
         return self.screen_manager
 
     def add_screen(self, layout, name):
