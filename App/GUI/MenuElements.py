@@ -1,0 +1,342 @@
+from cgi import test
+from datetime import timedelta
+from re import S
+from sqlite3 import Date
+from tkinter import Button, Grid, Menu
+from turtle import onrelease
+from typing import OrderedDict
+from kivy.core.text import LabelBase
+from kivy.core.window import Window
+from kivy.factory import Factory
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.textinput import TextInput
+from matplotlib.pyplot import text
+from numpy import short
+from urllib3 import encode_multipart_formdata
+
+from App.Json.JsonManager import JsonManager
+from App.GUI.Message import Message
+from App.GUI.Error import Error
+from App.GUI.Buttons import PrimaryButton, UsersButton
+
+# TO DO button for exits ect
+
+def testCall():
+    print("Lel")
+
+class EventInfo(GridLayout):
+    def __init__(self, app, **kw):
+        super(EventInfo, self).__init__(**kw)
+
+        self.cols = 1
+    
+        title = str(app.actualEvent)
+        short_desc = "short"
+        desc = "desc :D"
+
+        self.add_widget(Label(text=title))
+        self.add_widget(Label(text=short_desc))
+        self.add_widget(Label(text=desc))
+        self.add_widget(PrimaryButton(text="Edit", on_release = lambda x: testCall()))
+
+
+class Event(GridLayout):
+    def __init__(self, app, id, time, **kw):
+        super(Event, self).__init__(**kw)
+
+        self.cols = 1
+
+        
+
+
+        title = "title"
+        self.time = app.profile_manager.actual_date  # .strftime("%x")
+        short_desc = "test :D"
+
+        self.id = id
+
+        self.app = app
+
+        self.time = time
+
+
+        self.add_widget(PrimaryButton(text=title, on_release = lambda x: self.onrel()))
+        self.add_widget(PrimaryButton(text=self.time.strftime("%x"), on_release = lambda x: self.onrel()))
+        self.add_widget(PrimaryButton(text=short_desc, on_release = lambda x: self.onrel()))
+
+    def onrel(self):
+        print(self.id)
+        self.app.actualEvent = self.id
+        self.app.profile_manager.set_actual_date(self.time)
+        print(self.time.strftime("%x"))
+        self.app.changeBase()
+        self.app.change_logged_screen("Base")
+
+class DayMenu(GridLayout):
+    def __init__(self, app, day, **kw):
+        super(DayMenu, self).__init__(**kw)
+
+        self.cols = 3
+
+        left = GridLayout()
+        left.cols = 1
+        left.add_widget(DateShower(app=app))
+        left.add_widget(OneDayLayoutClickable(app=app, day=day))
+
+        self.add_widget(left)
+
+        self.add_widget(EventInfo(app=app))
+
+        right = GridLayout()
+        right.cols = 1
+        right.add_widget(MenuPanel(app=app))
+        right.add_widget(NotesTable(app=app))
+
+        self.add_widget(right)
+
+class NoteEdit(GridLayout):
+    def __init__(self, app, id, **kw):
+        super(NoteEdit, self).__init__(**kw)
+
+        self.cols = 1
+
+        title = ""
+        short_desc = ""
+        description = ""
+
+        self.title = TextInput()
+        self.title.text = title
+        self.add_widget(self.title)
+
+        self.short_desc = TextInput()
+        self.short_desc.text = short_desc
+        self.add_widget(self.short_desc)
+        
+        self.description = TextInput()
+        self.description.text = description
+        self.add_widget(self.description)
+
+        # buttons
+
+        buttons = GridLayout()
+        buttons.cols = 2
+        buttons.add_widget(PrimaryButton(text="Accept")) #TODO: saving changes to temporary json
+        buttons.add_widget(PrimaryButton(text="Cancel", on_release = lambda x: app.change_logged_screen("NoteInfo", id=id)))
+
+        self.add_widget(buttons)
+
+
+class NoteInfo(GridLayout):
+    def __init__(self, app, id, **kw):
+        super(NoteInfo, self).__init__(**kw)
+
+        self.cols = 1
+
+        title = "title"
+        shortDesc = "short :D"
+        description = "full desc"
+
+        self.add_widget(Label(text=title))
+        self.add_widget(Label(text=shortDesc))
+        self.add_widget(Label(text=description))
+
+        # buttons
+        buttons = GridLayout()
+
+        buttons.cols = 2
+        buttons.add_widget(PrimaryButton(text="Edit", on_release = lambda x: app.change_logged_screen("NoteEdit", id=id)))
+        buttons.add_widget(PrimaryButton(text="Cancel", on_release = lambda x: app.change_logged_screen("Base")))
+
+        self.add_widget(buttons)
+
+class Note(GridLayout):
+    def __init__(self, app, function, id, **kw):
+        super(Note, self).__init__(**kw)
+
+        self.cols = 1
+        self.id = id
+
+        self.on_release = function
+
+        title = "title"
+        shortDesc = "short :D"
+
+        self.add_widget(Label(text = title))
+        self.add_widget(Label(text = shortDesc))
+
+    def on_touch_down(self, touch):
+        self.on_release("NoteInfo", self.id)
+        return super().on_touch_down(touch)
+
+class NotesTable(ScrollView):
+    def __init__(self, app, **kw):
+        super(NotesTable, self).__init__(**kw)
+
+        self.do_scroll_y = True
+
+        id = 0
+
+        scroll_list = GridLayout()
+        scroll_list.row_default_height = 10     # TO DO: set up height of one note!
+        scroll_list.cols = 1
+
+        for i in range(3):
+            scroll_list.add_widget(Note(app=app, function=app.change_logged_screen, id = id))    # TO DO: fill with notes
+
+        self.add_widget(scroll_list)
+
+
+class MenuPanel(GridLayout):
+    def __init__(self, app, **kw):
+        super(MenuPanel, self).__init__(**kw)
+        self.cols = 3
+
+        for i in range(3):
+            self.add_widget(PrimaryButton(text = "Opt " + str(i)))
+
+class OneDayLayoutClickable(GridLayout):
+    def __init__(self, app, day, **kw):
+        super(OneDayLayoutClickable, self).__init__(**kw)
+        self.cols = 1
+
+        self.time = app.profile_manager.actual_date  # .strftime("%x")
+
+        scrollable_events = ScrollView()
+        scrollable_events.do_scroll_y = True
+
+        scroll_list = GridLayout()
+        scroll_list.cols = 1
+
+        scroll_list.row_default_height = 20
+        if day != -1:
+            week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+            for x in week:
+                if self.time.strftime("%a") == x:
+                    break
+                else:
+                    day -= 1
+
+            self.time += timedelta(days=day)
+
+        for i in range(2):
+            scroll_list.add_widget(Event(app=app, id=i, time=self.time))
+
+        scrollable_events.add_widget(scroll_list)
+
+        self.add_widget(scrollable_events)
+        
+        options_panel = GridLayout()
+        options_panel.cols = 3
+        options_panel.add_widget(PrimaryButton(text = "+"))
+        options_panel.add_widget(PrimaryButton(text = self.time.strftime("%x")))
+
+        self.swap_function = app.changeBase
+        self.swap_function_2 = app.change_logged_screen
+        options_panel.add_widget(PrimaryButton(text = "SWAP", on_release= lambda x: self.swapFunction()))
+
+        self.add_widget(options_panel)
+
+    def swapFunction(self):
+        self.swap_function()
+        self.swap_function_2("Base")
+
+        
+
+class DateShower(GridLayout):
+    def __init__(self, app, **kw):
+        super(DateShower, self).__init__(**kw)
+
+        date_text = "Date"
+
+        self.cols = 3
+
+        self.app = app
+
+        self.add_widget(PrimaryButton(text="<<", on_release = lambda x: self.change_date( - 7 * (app.base == "WeekMenu") - 1 * (app.base != "WeekMenu"))))
+
+        date_buttons = PrimaryButton(text=date_text, on_release = lambda x: app.change_logged_screen("DateChanger"))
+
+        self.add_widget(date_buttons)
+        self.add_widget(PrimaryButton(text=">>", on_release = lambda x: self.change_date(7 * (app.base == "WeekMenu") + 1 * (app.base != "WeekMenu"))))
+
+    def change_date(self, days):
+        self.app.profile_manager.change_actual_date(days)
+        self.app.change_logged_screen("Base")
+
+
+class DateChanger(GridLayout):
+    def __init__(self, app, **kw):
+        super(DateChanger, self).__init__(**kw)
+
+        self.cols = 1
+
+        textField = TextInput()
+        textField.text = "tu bedzie aktualna data :D"       # TO DO: set up date
+
+        self.add_widget(textField)
+
+        buttonsGrid = GridLayout()
+        buttonsGrid.cols = 2
+        buttonsGrid.add_widget(PrimaryButton(text="Accept")) # TO DO: set up button reaction
+        buttonsGrid.add_widget(PrimaryButton(text="Cancel", on_release = lambda x: app.change_logged_screen("Base")))
+
+        self.add_widget(buttonsGrid)
+
+class WeekMenu(GridLayout):
+    def __init__(self, app, **kw):
+        super(WeekMenu, self).__init__(**kw)
+        self.cols = 4
+
+        for x in range(3):
+            self.add_widget(OneDayLayoutClickable(app=app, day=x))
+
+        gridv1 = GridLayout()
+        gridv1.cols = 1
+
+        menu_panel = MenuPanel(app=app)
+
+        gridv1.add_widget(MenuPanel(app=app))
+        gridv1.add_widget(NotesTable(app=app))
+
+        self.add_widget(gridv1)
+
+        for x in range(3):
+            self.add_widget(OneDayLayoutClickable(app=app, day=x+3))
+        
+        gridv2 = GridLayout()
+        gridv2.cols = 1
+        gridv2.add_widget(DateShower(app=app))
+        gridv2.add_widget(OneDayLayoutClickable(app=app, day=6))
+
+        self.add_widget(gridv2)
+        
+
+
+"""class WeekMenu(GridLayout):
+    def __init__(self, app, **kw):
+        super(WeekMenu, self).__init__(**kw)
+        self.cols = 2
+        self.padding = 0
+        self.spacing = 20
+        self.add_widget(0)
+
+
+        LabelBase.register(name='Lemonada',
+                           fn_regular='lemonada.ttf')
+        select_user_btn = PrimaryButton(text='Select user',
+                                        on_release=lambda x: Factory.SelectUser(app).open())
+        new_user_btn = PrimaryButton(text='Add new user',
+                                     on_release=lambda x: Factory.NewUser(app).open())
+        import_btn = PrimaryButton(text='Import data',
+                                   on_release=lambda x: Factory.ImportData(app).open())
+        export_btn = PrimaryButton(text='Export data',
+                                   on_release=lambda x: Factory.ExportData(app).open())
+        self.add_widget(Label(text="Calendar App", font_size=50, font_name="Lemonada"))
+        self.add_widget(select_user_btn)
+        self.add_widget(new_user_btn)
+        self.add_widget(import_btn)
+        self.add_widget(export_btn)"""

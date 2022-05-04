@@ -126,7 +126,7 @@ class Login(GridLayout):
         self.padding = 0.1 * Window.width
         self.spacing = 20
         LabelBase.register(name='Lemonada',
-                           fn_regular='../../lemonada.ttf')
+                           fn_regular='lemonada.ttf')
         select_user_btn = PrimaryButton(text='Select user',
                                         on_release=lambda x: Factory.SelectUser(app).open())
         new_user_btn = PrimaryButton(text='Add new user',

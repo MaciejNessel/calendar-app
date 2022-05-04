@@ -5,7 +5,7 @@ from shutil import copyfile
 import requests
 from kivy.factory import Factory
 
-FILES_DIR = '../../'
+FILES_DIR = './'
 
 
 class JsonManager:
