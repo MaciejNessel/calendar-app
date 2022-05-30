@@ -176,6 +176,7 @@ class NotesTable(ScrollView):
         super(NotesTable, self).__init__(**kw)
 
         self.do_scroll_y = True
+        
 
         id = 0
 
@@ -194,8 +195,20 @@ class MenuPanel(GridLayout):
         super(MenuPanel, self).__init__(**kw)
         self.cols = 3
 
-        for i in range(3):
-            self.add_widget(PrimaryButton(text = "Opt " + str(i)))
+        self.app = app
+
+        self.add_widget(PrimaryButton(text="S", on_release = lambda x: self.opt1()))
+        self.add_widget(PrimaryButton(text="R", on_release = lambda x: self.opt2()))
+        self.add_widget(PrimaryButton(text="B", on_release = lambda x: self.opt3()))
+
+    def opt1(self):
+        self.app.profile_manager.save_profile()
+
+    def opt2(self):
+        self.app.profile_manager.load_user_data()
+
+    def opt3(self):
+        self.app.back_to_login()
 
 class OneDayLayoutClickable(GridLayout):
     def __init__(self, app, day, **kw):
