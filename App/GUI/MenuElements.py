@@ -1,5 +1,5 @@
 from cgi import test
-from datetime import timedelta
+from datetime import date, timedelta
 from re import S
 from sqlite3 import Date
 from tkinter import Button, Grid, Menu
@@ -288,16 +288,34 @@ class DateChanger(GridLayout):
         self.cols = 1
 
         textField = TextInput()
-        textField.text = "tu bedzie aktualna data :D"       # TO DO: set up date
+        textField.text = str(app.profile_manager.get_date()).split(" ")[0]
 
         self.add_widget(textField)
 
         buttonsGrid = GridLayout()
         buttonsGrid.cols = 2
-        buttonsGrid.add_widget(PrimaryButton(text="Accept")) # TO DO: set up button reaction
+        buttonsGrid.add_widget(PrimaryButton(text="Accept", on_release = lambda x: self.accept(app, textField.text)))
         buttonsGrid.add_widget(PrimaryButton(text="Cancel", on_release = lambda x: app.change_logged_screen("Base")))
 
         self.add_widget(buttonsGrid)
+
+    def accept(self, app, date_):
+        if len(date_.split("-")) != 3:
+            return
+
+        if len(date_.split("-")[0]) != 4:
+            return
+
+        if len(date_.split("-")[1]) < 1 or len(date_.split("-")[1]) > 2:
+            return
+
+        if len(date_.split("-")[2]) < 1 or len(date_.split("-")[2]) > 2:
+            return
+
+        app.profile_manager.set_actual_date(date(int(date_.split("-")[0]), int(date_.split("-")[1]), int(date_.split("-")[2])))
+
+        app.change_logged_screen("Base")
+        
 
 class WeekMenu(GridLayout):
     def __init__(self, app, **kw):
