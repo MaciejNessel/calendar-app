@@ -59,6 +59,23 @@ class JsonManager:
     def get_notes(self):
         return self.__note_details
 
+    def get_note_of_id(self, id):
+        counter_ = 0
+        for x in self.get_notes():
+            if counter_ == id:
+                return x
+        return
+
+    def change_note(self, id, title, desc):
+        counter_ = 0
+        for x in self.get_notes():
+            if counter_ == id:
+                x["title"] = title
+                x["text"] = desc
+                break
+
+        self.get_notes()
+
     def save(self, note_manager, event_manager, day_manager):
         result = {}
         user = {'username': self.__username}

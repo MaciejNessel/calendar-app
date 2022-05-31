@@ -103,9 +103,11 @@ class NoteEdit(GridLayout):
 
         self.cols = 1
 
-        title = ""
-        short_desc = ""
-        description = ""
+        note = app.json_manager.get_note_of_id(id)
+
+
+        title = note["title"]
+        short_desc = note["text"]
 
         self.title = TextInput()
         self.title.text = title
@@ -114,19 +116,18 @@ class NoteEdit(GridLayout):
         self.short_desc = TextInput()
         self.short_desc.text = short_desc
         self.add_widget(self.short_desc)
-        
-        self.description = TextInput()
-        self.description.text = description
-        self.add_widget(self.description)
 
         # buttons
 
         buttons = GridLayout()
         buttons.cols = 2
-        buttons.add_widget(PrimaryButton(text="Accept")) #TODO: saving changes to temporary json
+        buttons.add_widget(PrimaryButton(text="Accept", on_release = lambda x: self.accept(id))) #TODO: saving changes to temporary json
         buttons.add_widget(PrimaryButton(text="Cancel", on_release = lambda x: app.change_logged_screen("NoteInfo", id=id)))
 
         self.add_widget(buttons)
+
+    def accept(self, noteID, noteTitle, noteDesc):
+        pass
 
 
 class NoteInfo(GridLayout):
@@ -135,12 +136,12 @@ class NoteInfo(GridLayout):
 
         self.cols = 1
 
-        title = "title"
-        shortDesc = "short :D"
-        description = "full desc"
+        note = app.json_manager.get_note_of_id(id)
+
+        title = note["title"]
+        description = note["text"]
 
         self.add_widget(Label(text=title))
-        self.add_widget(Label(text=shortDesc))
         self.add_widget(Label(text=description))
 
         # buttons
@@ -148,21 +149,23 @@ class NoteInfo(GridLayout):
 
         buttons.cols = 2
         buttons.add_widget(PrimaryButton(text="Edit", on_release = lambda x: app.change_logged_screen("NoteEdit", id=id)))
+        buttons.add_widget(PrimaryButton(text="Delete", on_release = lambda x: app.change_logged_screen("NoteEdit", id=id)))
         buttons.add_widget(PrimaryButton(text="Cancel", on_release = lambda x: app.change_logged_screen("Base")))
 
         self.add_widget(buttons)
 
 class Note(GridLayout):
-    def __init__(self, app, function, id, **kw):
+    def __init__(self, app, function, id, note, **kw):
         super(Note, self).__init__(**kw)
 
         self.cols = 1
         self.id = id
+        self.note = note
 
         self.on_release = function
 
-        title = "title"
-        shortDesc = "short :D"
+        title = note["title"]
+        shortDesc = note["text"]
 
         self.add_widget(Label(text = title))
         self.add_widget(Label(text = shortDesc))
@@ -178,14 +181,20 @@ class NotesTable(ScrollView):
         self.do_scroll_y = True
         
 
+        allNotes = app.json_manager.get_notes()
+
+        
+            
+
         id = 0
 
         scroll_list = GridLayout()
         scroll_list.row_default_height = 10     # TO DO: set up height of one note!
         scroll_list.cols = 1
 
-        for i in range(3):
-            scroll_list.add_widget(Note(app=app, function=app.change_logged_screen, id = id))    # TO DO: fill with notes
+        for x in allNotes:
+            scroll_list.add_widget(Note(app=app, function=app.change_logged_screen, id = id, note = x))    # TO DO: fill with notes
+            id+=1
 
         self.add_widget(scroll_list)
 
