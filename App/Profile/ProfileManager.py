@@ -1,5 +1,6 @@
 import json
 from App.Events.EventManager import EventsManager
+from App.Notes.Note import Note
 from App.Notes.NotesManager import NotesManager
 from App.Days.DayManager import DayManager
 from App.Json.JsonManager import JsonManager
@@ -40,3 +41,18 @@ class ProfileManager:
 
     def get_date(self):
         return self.actual_date
+
+    def get_note(self, id):
+        return self.note_manager.get(id)
+
+    def get_all_notes_id(self):
+        return self.note_manager.get_all()
+
+    def set_note(self, title, desc, id = -1):
+        if id != -1:
+            self.note_manager.add(note = Note(title, desc, id))
+        else:
+            self.note_manager.add(title= title, text=desc)
+
+    def get_events_of_day(self, day, month, year):
+        return self.day_manager.get_day(day=day, month=month, year=year)

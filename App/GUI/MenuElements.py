@@ -1,5 +1,6 @@
 from cgi import test
 from datetime import date, timedelta
+from pickle import SHORT_BINUNICODE
 from re import S
 from sqlite3 import Date
 from tkinter import Button, Grid, Menu
@@ -44,7 +45,7 @@ class EventInfo(GridLayout):
 
 
 class Event(GridLayout):
-    def __init__(self, app, id, time, **kw):
+    def __init__(self, app, event, time, **kw):
         super(Event, self).__init__(**kw)
 
         self.cols = 1
@@ -103,32 +104,31 @@ class NoteEdit(GridLayout):
 
         self.cols = 1
 
-        note = app.json_manager.get_note_of_id(id)
+        note = app.profile_manager.get_note(id)
 
-
-        title = note["title"]
-        short_desc = note["text"]
+        title = note.get_title()
+        description = note.get_text()
 
         self.title = TextInput()
         self.title.text = title
         self.add_widget(self.title)
 
         self.short_desc = TextInput()
-        self.short_desc.text = short_desc
+        self.short_desc.text = description
         self.add_widget(self.short_desc)
 
         # buttons
 
         buttons = GridLayout()
         buttons.cols = 2
-        buttons.add_widget(PrimaryButton(text="Accept", on_release = lambda x: self.accept(id))) #TODO: saving changes to temporary json
+        buttons.add_widget(PrimaryButton(text="Accept", on_release = lambda x: self.accept(app, id, self.title.text, self.short_desc.text))) #TODO: saving changes to temporary json
         buttons.add_widget(PrimaryButton(text="Cancel", on_release = lambda x: app.change_logged_screen("NoteInfo", id=id)))
 
         self.add_widget(buttons)
 
-    def accept(self, noteID, noteTitle, noteDesc):
-        pass
-
+    def accept(self, app, id, title, short_desc):
+        app.profile_manager.set_note(title, short_desc, id)
+        app.change_logged_screen("NoteInfo", id=id)
 
 class NoteInfo(GridLayout):
     def __init__(self, app, id, **kw):
@@ -136,10 +136,10 @@ class NoteInfo(GridLayout):
 
         self.cols = 1
 
-        note = app.json_manager.get_note_of_id(id)
+        note = app.profile_manager.get_note(id)
 
-        title = note["title"]
-        description = note["text"]
+        title = note.get_title()
+        description = note.get_text()
 
         self.add_widget(Label(text=title))
         self.add_widget(Label(text=description))
@@ -147,7 +147,7 @@ class NoteInfo(GridLayout):
         # buttons
         buttons = GridLayout()
 
-        buttons.cols = 2
+        buttons.cols = 3
         buttons.add_widget(PrimaryButton(text="Edit", on_release = lambda x: app.change_logged_screen("NoteEdit", id=id)))
         buttons.add_widget(PrimaryButton(text="Delete", on_release = lambda x: app.change_logged_screen("NoteEdit", id=id)))
         buttons.add_widget(PrimaryButton(text="Cancel", on_release = lambda x: app.change_logged_screen("Base")))
@@ -164,11 +164,11 @@ class Note(GridLayout):
 
         self.on_release = function
 
-        title = note["title"]
-        shortDesc = note["text"]
+        title = note.get_title()
+        description = note.get_text()
 
         self.add_widget(Label(text = title))
-        self.add_widget(Label(text = shortDesc))
+        self.add_widget(Label(text = description))
 
     def on_touch_down(self, touch):
         self.on_release("NoteInfo", self.id)
@@ -181,10 +181,7 @@ class NotesTable(ScrollView):
         self.do_scroll_y = True
         
 
-        allNotes = app.json_manager.get_notes()
-
-        
-            
+        allNotesID = app.profile_manager.get_all_notes_id()
 
         id = 0
 
@@ -192,8 +189,8 @@ class NotesTable(ScrollView):
         scroll_list.row_default_height = 10     # TO DO: set up height of one note!
         scroll_list.cols = 1
 
-        for x in allNotes:
-            scroll_list.add_widget(Note(app=app, function=app.change_logged_screen, id = id, note = x))    # TO DO: fill with notes
+        for x in allNotesID:
+            scroll_list.add_widget(Note(app=app, function=app.change_logged_screen, id = x, note = app.profile_manager.get_note(x)))    # TO DO: fill with notes
             id+=1
 
         self.add_widget(scroll_list)
@@ -204,20 +201,18 @@ class MenuPanel(GridLayout):
         super(MenuPanel, self).__init__(**kw)
         self.cols = 3
 
-        self.app = app
+        self.add_widget(PrimaryButton(text="S", on_release = lambda x: self.opt1(app)))
+        self.add_widget(PrimaryButton(text="R", on_release = lambda x: self.opt2(app)))
+        self.add_widget(PrimaryButton(text="B", on_release = lambda x: self.opt3(app)))
 
-        self.add_widget(PrimaryButton(text="S", on_release = lambda x: self.opt1()))
-        self.add_widget(PrimaryButton(text="R", on_release = lambda x: self.opt2()))
-        self.add_widget(PrimaryButton(text="B", on_release = lambda x: self.opt3()))
+    def opt1(self, app):
+        app.profile_manager.save_profile()
 
-    def opt1(self):
-        self.app.profile_manager.save_profile()
+    def opt2(self, app):
+        app.profile_manager.load_user_data()
 
-    def opt2(self):
-        self.app.profile_manager.load_user_data()
-
-    def opt3(self):
-        self.app.back_to_login()
+    def opt3(self, app):
+        app.back_to_login()
 
 class OneDayLayoutClickable(GridLayout):
     def __init__(self, app, day, **kw):
@@ -244,8 +239,16 @@ class OneDayLayoutClickable(GridLayout):
 
             self.time += timedelta(days=day)
 
-        for i in range(2):
-            scroll_list.add_widget(Event(app=app, id=i, time=self.time))
+        day_ = int(self.time.strftime("%d"))
+        month_ = int(self.time.strftime("%m"))
+        year_ = int(self.time.strftime("%Y"))
+
+        for x in app.profile_manager.get_events_of_day(day_, month_, year_):
+            scroll_list.add_widget(Event(app=app, event=x, time=self.time))
+
+
+
+
 
         scrollable_events.add_widget(scroll_list)
 

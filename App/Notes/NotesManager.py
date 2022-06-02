@@ -18,6 +18,9 @@ class NotesManager:
         result = self.__notes.get(id_)
         return result
 
+    def get_all(self):
+        return self.__notes
+
     def add(self, note=None, title=None, text=None):
         if note is None:
             id_ = JsonManager.generate_id()

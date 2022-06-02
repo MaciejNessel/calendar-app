@@ -68,13 +68,11 @@ class JsonManager:
 
     def change_note(self, id, title, desc):
         counter_ = 0
-        for x in self.get_notes():
+        for x in self.__note_details:
             if counter_ == id:
                 x["title"] = title
                 x["text"] = desc
                 break
-
-        self.get_notes()
 
     def save(self, note_manager, event_manager, day_manager):
         result = {}
@@ -88,6 +86,8 @@ class JsonManager:
         result.update(days_json)
 
         copyfile(FILES_DIR + 'users/' + self.__username + '.json', FILES_DIR + 'users/old/' + self.__username + '.json')
+
+        print(result)
 
         with open(FILES_DIR + 'users/' + self.__username + '.json', 'w') as f:
             json.dump(result, f, indent=2)
