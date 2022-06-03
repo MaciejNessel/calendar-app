@@ -29,9 +29,17 @@ class DayManager:
         if date == "" and (day == -1 or month == -1 or year == -1):
             return None
         else:
-            # todo
-            pass
-        pass
+            day_ = ""
+            month_ = ""
+            year_ = ""
+            if day < 10:
+                day_ = "0"
+            day_ += str(day)
+            if month < 10:
+                month_ = "0"
+            month_ += str(month)
+            key = str(year) + "-" + month_ + "-" + day_
+            return self.__days.get(key)
 
     # save days to JSON file
     def save(self):

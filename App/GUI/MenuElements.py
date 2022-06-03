@@ -25,23 +25,40 @@ from App.GUI.Buttons import PrimaryButton, UsersButton
 
 # TO DO button for exits ect
 
-def testCall():
-    print("Lel")
-
 class EventInfo(GridLayout):
     def __init__(self, app, **kw):
         super(EventInfo, self).__init__(**kw)
 
         self.cols = 1
     
-        title = str(app.actualEvent)
-        short_desc = "short"
-        desc = "desc :D"
+        if app.actualEvent != None:
+            event_id = app.actualEvent
 
-        self.add_widget(Label(text=title))
-        self.add_widget(Label(text=short_desc))
-        self.add_widget(Label(text=desc))
-        self.add_widget(PrimaryButton(text="Edit", on_release = lambda x: testCall()))
+            self.event = app.profile_manager.get_event(event_id)
+
+            title = self.event.get_title()
+            short_desc = self.event.get_short_desc()
+            desc = self.event.get_desc()
+
+            self.title = TextInput()
+            self.title.text = title
+            self.add_widget(self.title)
+
+            self.short_desc = TextInput()
+            self.short_desc.text = short_desc
+            self.add_widget(self.short_desc)
+
+            self.desc = TextInput()
+            self.desc.text = desc
+            self.add_widget(self.desc)
+
+            self.add_widget(PrimaryButton(text="Save Changes", on_release = lambda x: self.edit_event(app)))
+
+    def edit_event(self, app):
+        self.event.set_title(self.title.text)
+        self.event.set_short_desc(self.short_desc)
+        self.event.set_desc(self.desc)
+        app.profile_manager.save_event(self.event)
 
 
 class Event(GridLayout):
@@ -50,14 +67,17 @@ class Event(GridLayout):
 
         self.cols = 1
 
-        
+        event_id = event["id_"]
+        start = event["start"]
+        end = event["end"]
 
+        event_ = app.profile_manager.get_event(event_id)
 
-        title = "title"
+        title = event_.get_title()
         self.time = app.profile_manager.actual_date  # .strftime("%x")
-        short_desc = "test :D"
+        short_desc = event_.get_short_desc()
 
-        self.id = id
+        self.id = event_id
 
         self.app = app
 
@@ -243,8 +263,12 @@ class OneDayLayoutClickable(GridLayout):
         month_ = int(self.time.strftime("%m"))
         year_ = int(self.time.strftime("%Y"))
 
-        for x in app.profile_manager.get_events_of_day(day_, month_, year_):
-            scroll_list.add_widget(Event(app=app, event=x, time=self.time))
+
+        day__ = app.profile_manager.get_events_of_day(day_, month_, year_)
+
+        if day__ != None:
+            for x in day__.get_events():
+                scroll_list.add_widget(Event(app=app, event=x, time=self.time))
 
 
 
