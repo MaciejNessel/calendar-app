@@ -55,10 +55,11 @@ class EventInfo(GridLayout):
             self.add_widget(PrimaryButton(text="Save Changes", on_release = lambda x: self.edit_event(app)))
 
     def edit_event(self, app):
-        self.event.set_title(self.title.text)
-        self.event.set_short_desc(self.short_desc)
-        self.event.set_desc(self.desc)
+        self.event.set_title(str(self.title.text))
+        self.event.set_short_desc(str(self.short_desc.text))
+        self.event.set_desc(str(self.desc.text))
         app.profile_manager.save_event(self.event)
+        app.change_logged_screen("Base")
 
 
 class Event(GridLayout):
@@ -93,7 +94,7 @@ class Event(GridLayout):
         self.app.actualEvent = self.id
         self.app.profile_manager.set_actual_date(self.time)
         print(self.time.strftime("%x"))
-        self.app.changeBase()
+        self.app.set_base("DayMenu")
         self.app.change_logged_screen("Base")
 
 class DayMenu(GridLayout):
@@ -229,6 +230,7 @@ class MenuPanel(GridLayout):
         app.profile_manager.save_profile()
 
     def opt2(self, app):
+        app.change_logged_screen("Base")
         app.profile_manager.load_user_data()
 
     def opt3(self, app):
@@ -280,16 +282,20 @@ class OneDayLayoutClickable(GridLayout):
         
         options_panel = GridLayout()
         options_panel.cols = 3
-        options_panel.add_widget(PrimaryButton(text = "+"))
+        options_panel.add_widget(PrimaryButton(text = "+", on_release = lambda x: self.event_add()))
         options_panel.add_widget(PrimaryButton(text = self.time.strftime("%x")))
 
         self.swap_function = app.changeBase
         self.swap_function_2 = app.change_logged_screen
-        options_panel.add_widget(PrimaryButton(text = "SWAP", on_release= lambda x: self.swapFunction()))
+        options_panel.add_widget(PrimaryButton(text = "SWAP", on_release= lambda x: self.swapFunction(app)))
 
         self.add_widget(options_panel)
 
-    def swapFunction(self):
+    def event_add(self):
+        pass
+
+    def swapFunction(self, app):
+        app.profile_manager.actual_date = self.time
         self.swap_function()
         self.swap_function_2("Base")
 

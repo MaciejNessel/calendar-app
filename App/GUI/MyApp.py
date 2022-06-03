@@ -82,3 +82,6 @@ class MyApp(App):
             self.base = "DayMenu"
         else:
             self.base = "WeekMenu"
+
+    def set_base(self, base):
+        self.base = base
