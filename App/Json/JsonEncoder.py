@@ -9,4 +9,5 @@ class JsonEncoder(JSONEncoder):
             return text
 
     def default(self, o):
+        print(o.get_title())
         return {self.prepare(k): v for k, v in vars(o).items()}

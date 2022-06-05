@@ -5,7 +5,7 @@ from re import S
 from sqlite3 import Date
 from tkinter import Button, Grid, Menu
 from turtle import onrelease
-from typing import OrderedDict
+from typing import OrderedDict, Text
 from kivy.core.text import LabelBase
 from kivy.core.window import Window
 from kivy.factory import Factory
@@ -89,11 +89,10 @@ class Event(GridLayout):
         self.add_widget(PrimaryButton(text=self.time.strftime("%x"), on_release = lambda x: self.onrel()))
         self.add_widget(PrimaryButton(text=short_desc, on_release = lambda x: self.onrel()))
 
+
     def onrel(self):
-        print(self.id)
         self.app.actualEvent = self.id
         self.app.profile_manager.set_actual_date(self.time)
-        print(self.time.strftime("%x"))
         self.app.set_base("DayMenu")
         self.app.change_logged_screen("Base")
 
@@ -236,6 +235,62 @@ class MenuPanel(GridLayout):
     def opt3(self, app):
         app.back_to_login()
 
+class EventAdd(GridLayout):
+    def __init__(self, app, **kwargs):
+        super(EventAdd, self).__init__(**kwargs)
+
+        self.cols = 1
+
+        title = "title"
+        short_desc = "short_desc"
+        desc = "full desc"
+        date = str(app.profile_manager.actual_date.strftime("%x"))
+        start = "00:00"
+        end = "24:00"
+
+        self.title = TextInput()
+        self.title.text = title
+        self.add_widget(self.title)
+
+        self.short_desc = TextInput()
+        self.short_desc.text = short_desc
+        self.add_widget(self.short_desc)
+
+        self.desc = TextInput()
+        self.desc.text = desc
+        self.add_widget(self.desc)
+
+        self.date = TextInput()
+        self.date.text = date
+        self.add_widget(self.date)
+
+        self.start = TextInput()
+        self.start.text = start
+        self.add_widget(self.start)
+
+        self.end = TextInput()
+        self.end.text = end
+        self.add_widget(self.end)
+
+        buttons = GridLayout()
+        buttons.cols = 2
+        buttons.add_widget(PrimaryButton(text="Accept", on_release = lambda x: self.add(app)))
+        buttons.add_widget(PrimaryButton(text="Back", on_release = lambda x: self.back(app)))
+
+        self.add_widget(buttons)
+
+    def add(self, app):
+        # todo: data validation
+
+        # create event, eventy dla dnia sa w dict o id rownych iod wydarzeń
+        event_id = app.profile_manager.event_manager.add(title=self.title.text, short_desc=self.short_desc.text, desc=self.desc.text)
+        # add to day list
+        app.profile_manager.day_manager.add_event_to_day(date=self.date.text, event_id=event_id, start=self.start.text, end=self.end.text)
+        self.back(app)
+
+    def back(self, app):
+        app.change_logged_screen("Base")
+
 class OneDayLayoutClickable(GridLayout):
     def __init__(self, app, day, **kw):
         super(OneDayLayoutClickable, self).__init__(**kw)
@@ -268,8 +323,10 @@ class OneDayLayoutClickable(GridLayout):
 
         day__ = app.profile_manager.get_events_of_day(day_, month_, year_)
 
+
         if day__ != None:
             for x in day__.get_events():
+                print(type(x))
                 scroll_list.add_widget(Event(app=app, event=x, time=self.time))
 
 
@@ -282,7 +339,7 @@ class OneDayLayoutClickable(GridLayout):
         
         options_panel = GridLayout()
         options_panel.cols = 3
-        options_panel.add_widget(PrimaryButton(text = "+", on_release = lambda x: self.event_add()))
+        options_panel.add_widget(PrimaryButton(text = "+", on_release = lambda x: self.event_add(app)))
         options_panel.add_widget(PrimaryButton(text = self.time.strftime("%x")))
 
         self.swap_function = app.changeBase
@@ -291,8 +348,8 @@ class OneDayLayoutClickable(GridLayout):
 
         self.add_widget(options_panel)
 
-    def event_add(self):
-        pass
+    def event_add(self, app):
+        app.change_logged_screen("EventAdd")
 
     def swapFunction(self, app):
         app.profile_manager.actual_date = self.time
@@ -305,7 +362,7 @@ class DateShower(GridLayout):
     def __init__(self, app, **kw):
         super(DateShower, self).__init__(**kw)
 
-        date_text = "Date"
+        date_text = str(app.profile_manager.actual_date.strftime("%x"))
 
         self.cols = 3
 

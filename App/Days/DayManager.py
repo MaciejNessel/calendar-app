@@ -15,7 +15,21 @@ class DayManager:
 
     # Add Event Id to day
     def add_event_to_day(self, event_id, start, end, date="", day=-1, month=-1, year=-1):
-        pass
+        event_info = {
+                "id_" : event_id,
+                "start": start,
+                "end": end
+            }
+
+        date = "20" + date.split("/")[2] + "-" + date.split("/")[0] + "-" + date.split("/")[1]
+
+        if self.get_day(date=date) == None:
+            new_day = Day(date, events_=[], notes=[])
+            new_day.add_event_to_day(event=event_info)
+            self.__days.update({date: new_day})
+        else:
+            old_day = self.get_day(date=date)
+            old_day.add_event_to_day(event_info)
 
     # Cut string date to int array [day, month, year]
     # date format DD-MM-YYYY
@@ -28,7 +42,7 @@ class DayManager:
     def get_day(self, date="", day=-1, month=-1, year=-1):
         if date == "" and (day == -1 or month == -1 or year == -1):
             return None
-        else:
+        elif date == "":
             day_ = ""
             month_ = ""
             year_ = ""
@@ -40,6 +54,8 @@ class DayManager:
             month_ += str(month)
             key = str(year) + "-" + month_ + "-" + day_
             return self.__days.get(key)
+        else:
+            return self.__days.get(date)
 
     # save days to JSON file
     def save(self):

@@ -8,24 +8,14 @@ class Day:
         self.__date = date
         self.__events = events_
         self.__notes = notes
+        for x in self.__events:
+            print(type(x))
 
     def add_event_to_day(self, event):
-        try:
-            if type(event) != Event:
-                raise AttributeError
-            else:
-                self.__events.add(event)
-        except AttributeError:
-            print("An exception occurred: (AttributeError) Day add_event_to_day()")
-
+        self.__events.append(event)
+        
     def add_note_to_day(self, note):
-        try:
-            if type(note) != Note:
-                raise AttributeError
-            else:
-                self.__events.add(note)
-        except AttributeError:
-            print("An exception occurred: (AttributeError) Day add_event_to_day()")
+        self.__notes.add(note)
 
     def get_events(self):
         return self.__events

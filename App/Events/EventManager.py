@@ -19,13 +19,18 @@ class EventsManager:
     def add(self, event=None, title="", short_desc="", desc="", notes_id=[]):
         if event is None:
             id_ = JsonManager.generate_id()
-            self.__events[id_] = Event(title, short_desc, desc, id_, notes_id)
+            self.__events[str(id_)] = Event(title, short_desc, desc, id_, notes_id)
+            return str(id_)
         else:
             self.__events[event.get_id()] = event
+            return str(event.get_id())
 
     # Get Event
     def get(self, id_):
-        return self.__events[id_]
+        if id_ not in self.__events.keys():
+            return None
+        else:
+            return self.__events[id_]
 
     # Reset Events
     def reset(self):
