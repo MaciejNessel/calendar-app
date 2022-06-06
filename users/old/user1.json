@@ -16,13 +16,21 @@
       "id_": "54584d05-b677-11ec-89d7-d45d645a64b7",
       "notes_id": [],
       "color": "#8338ec"
+    },
+    {
+      "title": "title",
+      "short_desc": "short_desc",
+      "desc": "full desc",
+      "id_": "4365e1d0-e5d2-11ec-843c-e848b8c82000",
+      "notes_id": [],
+      "color": "#ff32ccff"
     }
   ],
   "noteDetails": [
     {
-      "title": "notatka2t",
-      "text": "text2",
-      "id": null
+      "title": "title",
+      "text": "description",
+      "id": "ebc1d693-e5da-11ec-b8a6-e848b8c82000"
     }
   ],
   "dataPerDay": [
@@ -67,6 +75,17 @@
       "notes": [
         "8ac07579-b677-11ec-9d6a-d45d645a64b7"
       ]
+    },
+    {
+      "date": "2022-06-07",
+      "events": [
+        {
+          "id_": "4365e1d0-e5d2-11ec-843c-e848b8c82000",
+          "start": "00:00",
+          "end": "24:00"
+        }
+      ],
+      "notes": []
     }
   ]
 }
