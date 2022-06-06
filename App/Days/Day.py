@@ -8,8 +8,6 @@ class Day:
         self.__date = date
         self.__events = events_
         self.__notes = notes
-        for x in self.__events:
-            print(type(x))
 
     def add_event_to_day(self, event):
         self.__events.append(event)
