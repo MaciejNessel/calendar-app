@@ -25,10 +25,16 @@ class DayMenu(GridLayout):
         self.cols = 1
         self.add_widget(MenuPanel(app=app))
 
+        current_date = app.profile_manager.get_date().strftime("%d %B %Y, %A")
+        current_date_label = Label(text=current_date, size_hint_y=None, height=50, font_size='24sp', font_name="Lemonada")
+        self.add_widget(current_date_label)
+
+
         day_info = GridLayout(cols=3)
 
         left = GridLayout(cols=1)
-        left.add_widget(OneDayLayoutClickable(app=app, day=day))
+        left.add_widget(TitleButton(text="Events", font_name="Lemonada"))
+        left.add_widget(OneDayLayoutClickable(app=app, day=day, header=False))
 
         day_info.add_widget(left)
 
@@ -199,7 +205,7 @@ class MenuPanel(BoxLayout):
 
 
 class OneDayLayoutClickable(GridLayout):
-    def __init__(self, app, day, **kw):
+    def __init__(self, app, day, header=True, **kw):
         super(OneDayLayoutClickable, self).__init__(**kw)
         self.cols = 1
         self.time = app.profile_manager.actual_date
@@ -222,7 +228,6 @@ class OneDayLayoutClickable(GridLayout):
         year_ = int(self.time.strftime("%Y"))
 
         day__ = app.profile_manager.get_events_of_day(day_, month_, year_)
-        is_today = (self.time.strftime("%d%m%Y") == datetime.now().strftime("%d%m%Y"))
 
         if day__ is not None:
             for x in day__.get_events():
@@ -232,17 +237,21 @@ class OneDayLayoutClickable(GridLayout):
 
         self.swap_function = app.changeBase
         self.swap_function_2 = app.change_logged_screen
-        event_header = TitleButton(on_release=lambda _: self.swapFunction(app))
-        event_header.is_selected = is_today
-        event_header.day_number = self.time.strftime("%d")
-        event_header.day_name = self.time.strftime("%A")
-        self.add_widget(event_header)
+        if header: self.add_header(app)
         self.add_widget(scrollable_events)
 
     def swapFunction(self, app):
         app.profile_manager.actual_date = self.time
         self.swap_function()
         self.swap_function_2("Base")
+
+    def add_header(self, app):
+        is_today = (self.time.strftime("%d%m%Y") == datetime.now().strftime("%d%m%Y"))
+        event_header = TitleButton(on_release=lambda _: self.swapFunction(app))
+        event_header.is_selected = is_today
+        event_header.day_number = self.time.strftime("%d")
+        event_header.day_name = self.time.strftime("%A")
+        self.add_widget(event_header)
 
 
 class DateShower(GridLayout):

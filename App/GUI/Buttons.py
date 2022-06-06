@@ -97,6 +97,7 @@ kv = """
     size_hint_y: None
     cols: 1
     height: self.minimum_height
+    spacing: 5
 """
 
 
