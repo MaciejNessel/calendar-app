@@ -12,14 +12,14 @@ class EventsManager:
         data = self.__json_manager.get_events()
         for event in data:
             new_event = Event(event.get('title'), event.get('short_desc'),
-                              event.get('desc'), event.get('id_'), event.get('notes_id'))
+                              event.get('desc'), event.get('id_'), event.get('notes_id'), event.get('color'))
             self.__events.update({event.get('id_'): new_event})
 
     # Add Event to local list
-    def add(self, event=None, title="", short_desc="", desc="", notes_id=[]):
+    def add(self, event=None, title="", short_desc="", desc="", notes_id=[], color=""):
         if event is None:
             id_ = JsonManager.generate_id()
-            self.__events[str(id_)] = Event(title, short_desc, desc, id_, notes_id)
+            self.__events[str(id_)] = Event(title, short_desc, desc, id_, notes_id, color)
             return str(id_)
         else:
             self.__events[event.get_id()] = event

@@ -11,6 +11,7 @@ from App.Json.JsonManager import JsonManager
 from App.GUI.Error import Error
 from App.Profile.ProfileManager import ProfileManager
 
+
 class MyApp(App):
     def __init__(self, **kwargs):
         super(MyApp, self).__init__(**kwargs)
@@ -23,7 +24,7 @@ class MyApp(App):
         self.actualEvent = None
 
     def build(self):
-        #Window.clearcolor = (1, 1, 1, 1)
+        # Window.clearcolor = (1, 1, 1, 1)
         return self.screen_manager
 
     def add_screen(self, layout, name):
@@ -33,24 +34,23 @@ class MyApp(App):
 
     def change_user(self, username):
         if not self.json_manager.load_data(username):
-            Factory.Error("Loading "+username+" data failed.").open()
+            Factory.Error("Loading " + username + " data failed.").open()
             return
 
-        self.profile_manager = ProfileManager(username = username, json_manager=self.json_manager)
+        self.profile_manager = ProfileManager(username=username, json_manager=self.json_manager)
         self.base = "WeekMenu"
-
 
         if self.home:
             self.screen_manager.remove_widget(self.home)
 
-        self.home = Screen(name = "WeekMenu")
+        self.home = Screen(name="WeekMenu")
         self.home.add_widget(WeekMenu(self))
 
         self.screen_manager.add_widget(self.home)
         self.screen_manager.current = "WeekMenu"
 
     def change_logged_screen(self, screen_name, id=-1):
-        temp_home = Screen(name = screen_name)
+        temp_home = Screen(name=screen_name)
         if screen_name == "WeekMenu":
             temp_home.add_widget(WeekMenu(self))
         elif screen_name == "DateChanger":
@@ -74,7 +74,6 @@ class MyApp(App):
         self.home = temp_home
         self.screen_manager.add_widget(self.home)
         self.screen_manager.current = screen_name
-        
 
     def back_to_login(self):
         self.screen_manager.current = 'Login'

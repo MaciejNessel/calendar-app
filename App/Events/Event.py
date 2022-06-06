@@ -2,12 +2,13 @@ import json
 from App.Json.JsonEncoder import JsonEncoder
 
 class Event:
-    def __init__(self, title, short_desc, desc, id_, notes_id):
+    def __init__(self, title, short_desc, desc, id_, notes_id, color):
         self.__title = title
         self.__short_desc = short_desc
         self.__desc = desc
         self.__id_ = id_
         self.__notes_id = notes_id
+        self.__color = color
 
     # Return Event object in Json format
     def to_json(self):
@@ -30,6 +31,9 @@ class Event:
     def get_notes_id(self):
         return self.__notes_id
 
+    def get_color(self):
+        return self.__color
+
     # Setter to __title
     def set_title(self, title):
         self.__title = title
@@ -41,6 +45,9 @@ class Event:
     # Setter to __desc
     def set_desc(self, desc):
         self.__desc = desc
+
+    def set_color(self, new_color):
+        self.__color = new_color
 
     # Add note of Id to __notes_id(Event)
     def addNote(self, note_id):

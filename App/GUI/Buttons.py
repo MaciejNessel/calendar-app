@@ -22,12 +22,66 @@ kv = """
         Rectangle:
             pos: self.pos
             size: self.size
+            
+<EventButton@Button>:
+    btn_color: .4,.4,.4,.2
+    background_normal: ''
+    background_down: ''
+    background_color: 0, 1, 0, 1
+    text_size: self.size
+    canvas.before:
+        Color:
+            rgba: self.btn_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<TopButton@Button>:
+    size_hint_y: None
+    height: 50
+
+<TitleButton@Button>:
+    size_hint_y: None
+    height: 50
+
+<NoteButton@Button>:
+    size_hint_y: None
+    btn_color: .4,.4,.4,.2
+    background_normal: ''
+    background_down: ''
+    background_color: 0, 1, 0, 1
+    text_size: self.size
+    height: self.texture_size[1]
+    canvas.before:
+        Color:
+            rgba: self.btn_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            
+            
+<MenuButton@Button>:
+    size_hint_x: None
+    width: 50
+    background_normal: 'resources/menu_hamburger.png'
+
+    
 """
 
 
 class PrimaryButton(Button):
     pass
 class UsersButton(Button):
+    pass
+class EventButton(Button):
+    pass
+class TopButton(Button):
+    pass
+class TitleButton(Button):
+    pass
+class NoteButton(Button):
+    pass
+class MenuButton(Button):
     pass
 
 Builder.load_string(kv)
