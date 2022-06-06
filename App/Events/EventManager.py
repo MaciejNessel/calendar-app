@@ -9,6 +9,7 @@ class EventsManager:
 
     # Load events from JSON file
     def load(self):
+        self.__events.clear()
         data = self.__json_manager.get_events()
         for event in data:
             new_event = Event(event.get('title'), event.get('short_desc'),
