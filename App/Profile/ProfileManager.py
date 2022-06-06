@@ -43,6 +43,11 @@ class ProfileManager:
     def get_date(self):
         return self.actual_date
 
+    def get_date_range(self):
+        actual_date_temp = self.actual_date
+        actual_date_temp -= timedelta(days=actual_date_temp.weekday())
+        return actual_date_temp, actual_date_temp + timedelta(days=6)
+
     def get_note(self, id):
         return self.note_manager.get(id)
 

@@ -1,11 +1,13 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
+from kivy.factory import Factory
 from kivy.graphics import Color, Rectangle
 from kivy.uix.actionbar import ActionDropDown
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 from App.GUI.Buttons import PrimaryButton, UsersButton, TopButton, TitleButton, NoteButton, MenuButton, ScrollGrid
@@ -129,7 +131,7 @@ class NotesTable(GridLayout):
         self.cols = 1
         allNotesID = app.profile_manager.get_all_notes_id()
 
-        self.add_widget(TitleButton(text="Notes"))
+        self.add_widget(TitleButton(text="Notes", font_name="Lemonada"))
 
         scroll_list = ScrollGrid()
 
@@ -202,8 +204,7 @@ class OneDayLayoutClickable(GridLayout):
         self.cols = 1
         self.time = app.profile_manager.actual_date
         scrollable_events = ScrollView(do_scroll_x=False,
-                                       do_scroll_y=True
-        )
+                                       do_scroll_y=True)
         scroll_list = ScrollGrid()
         if day != -1:
             week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -221,6 +222,7 @@ class OneDayLayoutClickable(GridLayout):
         year_ = int(self.time.strftime("%Y"))
 
         day__ = app.profile_manager.get_events_of_day(day_, month_, year_)
+        is_today = (self.time.strftime("%d%m%Y") == datetime.now().strftime("%d%m%Y"))
 
         if day__ is not None:
             for x in day__.get_events():
@@ -230,9 +232,11 @@ class OneDayLayoutClickable(GridLayout):
 
         self.swap_function = app.changeBase
         self.swap_function_2 = app.change_logged_screen
-
-        self.add_widget(TitleButton(text=self.time.strftime("%d/%m/%y") + "\n" + self.time.strftime("%A"),
-                                    on_release=lambda _: self.swapFunction(app)))
+        event_header = TitleButton(on_release=lambda _: self.swapFunction(app))
+        event_header.is_selected = is_today
+        event_header.day_number = self.time.strftime("%d")
+        event_header.day_name = self.time.strftime("%A")
+        self.add_widget(event_header)
         self.add_widget(scrollable_events)
 
     def swapFunction(self, app):
@@ -257,7 +261,7 @@ class DateShower(GridLayout):
                               background_normal='resources/calendar.png',
                               height=50,
                               width=100,
-                              on_release=lambda x: app.change_logged_screen("DateChanger"))
+                              on_release=lambda x: Factory.DateChanger(app).open())
 
         self.add_widget(date_buttons)
         self.add_widget(PrimaryButton(text=">>", on_release=lambda x: self.change_date(
@@ -269,25 +273,31 @@ class DateShower(GridLayout):
         self.app.change_logged_screen("Base")
 
 
-class DateChanger(GridLayout):
+class DateChanger(Popup):
     def __init__(self, app, **kw):
         super(DateChanger, self).__init__(**kw)
-
+        self.size_hint = (.7, .7)
         self.cols = 1
+        self.title = ""
+        layout = GridLayout(cols=1,
+                            spacing=10,
+                            padding=20)
 
         textField = TextInput()
         textField.text = str(app.profile_manager.get_date()).split(" ")[0]
 
-        self.add_widget(textField)
+        layout.add_widget(textField)
 
         buttonsGrid = GridLayout()
         buttonsGrid.cols = 2
         buttonsGrid.add_widget(PrimaryButton(text="Accept", on_release=lambda x: self.accept(app, textField.text)))
-        buttonsGrid.add_widget(PrimaryButton(text="Cancel", on_release=lambda x: app.change_logged_screen("Base")))
+        buttonsGrid.add_widget(PrimaryButton(text="Cancel", on_release=lambda x: self.dismiss()))
 
-        self.add_widget(buttonsGrid)
+        layout.add_widget(buttonsGrid)
+        self.add_widget(layout)
 
     def accept(self, app, date_):
+        self.dismiss()
         if len(date_.split("-")) != 3:
             return
 
@@ -314,6 +324,11 @@ class WeekMenu(GridLayout):
         self.add_widget(MenuPanel(app=app))
 
         week_grid = GridLayout(cols=4)
+        left_range, right_range = app.profile_manager.get_date_range()
+        left_range, right_range = left_range.strftime("%b %d, %Y"), right_range.strftime("%b %d, %Y")
+
+        date_range_label = Label(text=left_range+" - "+right_range, size_hint_y=None, height=50, font_size='24sp', font_name="Lemonada")
+        self.add_widget(date_range_label)
 
         for x in range(3):
             week_grid.add_widget(OneDayLayoutClickable(app=app, day=x))

@@ -4,12 +4,14 @@ from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 
 kv = """
+#:import utils kivy.utils
+
 <PrimaryButton@Button>:
     font_name: "Lemonada"
     background_color: 0,0,0,0
     canvas.before:
         Color:
-            rgba: (.4,.4,.4,1) if self.state=='normal' else (0,.7,.7,1)
+            rgb: utils.get_color_from_hex("#1b263b") if self.state=='normal' else utils.get_color_from_hex("#415a77")
         RoundedRectangle:
             pos: self.pos
             size: self.size
@@ -39,12 +41,34 @@ kv = """
             size: self.size
 
 <TopButton@Button>:
+    background_color: "#415a77"
     size_hint_y: None
     height: 50
+    
 
 <TitleButton@Button>:
+    background_normal: ''
+    background_down: ''
+    background_color: 0, 1, 0, 1
+    is_selected: False
+    background_color: "#1D334D" if self.is_selected==True else "#112339"
+    day_number: ""
+    day_name: ""
     size_hint_y: None
     height: 50
+    BoxLayout:
+        canvas.before:
+            Color:
+                rgba: root.background_color
+        pos: root.pos
+        size: root.size
+        Label: 
+            font_size: '24sp'
+            text: root.day_number
+            font_name: "Lemonada"
+        Label: 
+            text: root.day_name
+            font_name: "Lemonada"
 
 <NoteButton@Button>:
     size_hint_y: None

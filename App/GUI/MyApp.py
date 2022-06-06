@@ -1,21 +1,17 @@
-from email.policy import default
 from kivy.app import App
+from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.uix.screenmanager import ScreenManager, NoTransition, Screen
-
 from App.GUI.Login import Login
-from App.GUI.Home import Home
 from App.GUI.MenuElements import *
 from App.Json.JsonManager import JsonManager
-
-from App.GUI.Error import Error
 from App.Profile.ProfileManager import ProfileManager
 
 
 class MyApp(App):
     def __init__(self, **kwargs):
         super(MyApp, self).__init__(**kwargs)
-        self.screen_manager = ScreenManager()
+        self.screen_manager = ScreenManager(transition=NoTransition())
         self.home = None
         self.add_screen(Login(self), "Login")
         self.json_manager = JsonManager()
@@ -24,7 +20,9 @@ class MyApp(App):
         self.actualEvent = None
 
     def build(self):
-        # Window.clearcolor = (1, 1, 1, 1)
+        Window.clearcolor = "#0d1b2a"
+        Window.size = (900, 600)
+        Window.minimum_width, Window.minimum_height = Window.size
         return self.screen_manager
 
     def add_screen(self, layout, name):
@@ -53,8 +51,6 @@ class MyApp(App):
         temp_home = Screen(name=screen_name)
         if screen_name == "WeekMenu":
             temp_home.add_widget(WeekMenu(self))
-        elif screen_name == "DateChanger":
-            temp_home.add_widget(DateChanger(self))
         elif screen_name == "Base":
             return self.change_logged_screen(self.base)
         elif screen_name == "NoteInfo":
@@ -69,10 +65,11 @@ class MyApp(App):
             return
 
         if self.home:
+            self.screen_manager.add_widget(temp_home)
             self.screen_manager.remove_widget(self.home)
 
         self.home = temp_home
-        self.screen_manager.add_widget(self.home)
+
         self.screen_manager.current = screen_name
 
     def back_to_login(self):
@@ -86,3 +83,4 @@ class MyApp(App):
 
     def set_base(self, base):
         self.base = base
+

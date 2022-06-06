@@ -18,6 +18,7 @@ class SelectUser(Popup):
         super(SelectUser, self).__init__(**kw)
         self.app = app
         self.size_hint = (.7, .7)
+        self.background_color = '#0d1b2a'
         layout = GridLayout(cols=1)
         layout.padding = 20
         layout.spacing = 20
@@ -51,11 +52,13 @@ class SelectUser(Popup):
         self.dismiss()
         self.app.change_user(instance.text)
 
+
 # Template for NewUser, ImportData and ExportData
 class LoginPopup(Popup):
     def __init__(self, **kw):
         super(LoginPopup, self).__init__(**kw)
         self.size_hint = (.7, .7)
+        self.background_color = '#0d1b2a'
         layout = GridLayout(cols=1,
                             spacing=10,
                             padding=20)
@@ -71,6 +74,7 @@ class LoginPopup(Popup):
         layout.add_widget(back_btn)
 
         self.add_widget(layout)
+
 
 class NewUser(LoginPopup):
     def __init__(self, app, **kw):
@@ -90,6 +94,7 @@ class NewUser(LoginPopup):
         else:
             Factory.Error(result[1]).open()
 
+
 class ImportData(LoginPopup):
     def __init__(self, app, **kw):
         super(ImportData, self).__init__(**kw)
@@ -106,6 +111,7 @@ class ImportData(LoginPopup):
 
         self.dismiss()
 
+
 class ExportData(LoginPopup):
     def __init__(self, app, **kw):
         super(ExportData, self).__init__(**kw)
@@ -116,6 +122,7 @@ class ExportData(LoginPopup):
 
     def export(self):
         self.input_field.text = self.app.json_manager.export_data()
+
 
 class Login(GridLayout):
     def __init__(self, app, **kw):
