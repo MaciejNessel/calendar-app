@@ -71,3 +71,6 @@ class ProfileManager:
 
     def add_note(self, title, desc):
         self.note_manager.add(title=title, text=desc)
+
+    def delete_event(self, event):
+        self.event_manager.delete(event.get_id())

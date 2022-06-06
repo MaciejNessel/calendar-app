@@ -1,3 +1,4 @@
+from codecs import getincrementaldecoder
 from kivy.factory import Factory
 from kivy.uix.colorpicker import ColorPicker
 from kivy.uix.gridlayout import GridLayout
@@ -68,7 +69,21 @@ class EventInfo(GridLayout):
         self.add_widget(EventButton(text=self.title, background_color=self.color, font_size='24sp', size_hint_y=None, bold=True))
         self.add_widget(EventButton(text=self.short_desc, background_color=self.color, size_hint_y=None))
         self.add_widget(EventButton(text=self.desc, background_color=self.color, size_hint_y=None))
-        self.add_widget(PrimaryButton(text="Edit event", on_release=lambda x: Factory.EventEdit(app, self.event).open()))
+        
+        buttons = GridLayout()
+        buttons.cols = 2
+        
+        buttons.add_widget(PrimaryButton(text="Edit event", on_release=lambda x: Factory.EventEdit(app, self.event).open()))
+        buttons.add_widget(PrimaryButton(text="Delete event", on_release=lambda x: self.delete(app)))
+
+        self.add_widget(buttons)
+
+    def delete(self, app):
+        app.actualEvent = None
+
+        app.profile_manager.delete_event(self.event)
+
+        app.change_logged_screen("Base")
 
 class SingleEvent(GridLayout):
     def __init__(self, app, event, time, **kw):
