@@ -86,3 +86,6 @@ class MyApp(App):
     def set_base(self, base):
         self.base = base
 
+    def reset_actual_event(self):
+        self.actualEvent = None
+
