@@ -152,7 +152,7 @@ class Note(GridLayout):
         self.note = note
 
         self.size_hint_y = None
-        self.height = 30
+        self.height = 70
 
         self.on_release = function
 
