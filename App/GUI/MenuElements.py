@@ -322,6 +322,7 @@ class DateShower(GridLayout):
                                       size_hint=(None, None), width=50, height=50))
 
     def change_date(self, days):
+        self.app.reset_actual_event()
         self.app.profile_manager.change_actual_date(days)
         self.app.change_logged_screen("Base")
 

@@ -53,9 +53,7 @@ class EventInfo(GridLayout):
         super(EventInfo, self).__init__(**kw)
 
         self.cols = 1
-
         event_id = app.actualEvent
-
         if not event_id:
             return
 
