@@ -19,9 +19,9 @@ class EventsManager:
     # Add Event to local list
     def add(self, event=None, title="", short_desc="", desc="", notes_id=[], color=""):
         if event is None:
-            id_ = JsonManager.generate_id()
-            self.__events[str(id_)] = Event(title, short_desc, desc, id_, notes_id, color)
-            return str(id_)
+            id_ = str(JsonManager.generate_id())
+            self.__events[id_] = Event(title, short_desc, desc, id_, notes_id, color)
+            return id_
         else:
             self.__events[event.get_id()] = event
             return str(event.get_id())

@@ -68,3 +68,6 @@ class ProfileManager:
 
     def save_event(self, event):
         self.event_manager.add(event=event)
+
+    def add_note(self, title, desc):
+        self.note_manager.add(title=title, text=desc)

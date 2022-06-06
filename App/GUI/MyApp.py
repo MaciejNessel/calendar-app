@@ -61,6 +61,8 @@ class MyApp(App):
             temp_home.add_widget(DayMenu(self, -1))
         elif screen_name == "EventAdd":
             temp_home.add_widget(EventAdd(self))
+        elif screen_name == "NoteAdd":
+            temp_home.add_widget(NoteAdd(self))
         else:
             return
 

@@ -48,6 +48,41 @@ class DayMenu(GridLayout):
 
         self.add_widget(day_info)
 
+class NoteAdd(GridLayout):
+    def __init__(self, app, **kw):
+        super(NoteAdd, self).__init__(**kw)
+        self.cols = 1
+        
+        title = "title"
+        desc = "description"
+
+        self.title = TextInput()
+        self.title.text = title
+        self.add_widget(self.title)
+
+        self.desc = TextInput()
+        self.desc.text = desc
+        self.add_widget(self.desc)
+
+        buttons = GridLayout()
+        buttons.cols = 2
+
+        buttons.add_widget(PrimaryButton(text="Accept", on_release= lambda x: self.accept(app)))
+        buttons.add_widget(PrimaryButton(text="Back", on_release=  lambda x: self.back(app)))
+        
+        self.add_widget(buttons)
+
+    def accept(self, app):
+        
+        #add note
+        app.profile_manager.add_note(self.title.text, self.desc.text)
+
+
+        self.back(app)
+
+    def back(self, app):
+        app.change_logged_screen("Base")
+
 
 class NoteEdit(GridLayout):
     def __init__(self, app, id, **kw):
@@ -118,6 +153,9 @@ class Note(GridLayout):
         self.id = id
         self.note = note
 
+        self.size_hint_y = None
+        self.height = 30
+
         self.on_release = function
 
         title = note.get_title()
@@ -174,10 +212,14 @@ class MenuPanel(BoxLayout):
 
         self.add_widget(dropdown_btn)
         self.add_widget(
-            PrimaryButton(text="+ Create", on_release=lambda _: self.event_add(app), size_hint=(None, None), width=100,
+            PrimaryButton(text="+ Event", on_release=lambda _: self.event_add(app), size_hint=(None, None), width=100,
                           height=50))
 
         self.add_widget(DateShower(app=app))
+
+        self.add_widget(
+            PrimaryButton(text="+ Note", on_release=lambda _: self.note_add(app), size_hint=(None, None), width=100,
+                          height=50))
 
         swap_view_button = PrimaryButton(text="Swap view", on_release=lambda _: self.swap_view(app))
         self.add_widget(swap_view_button)
@@ -202,6 +244,9 @@ class MenuPanel(BoxLayout):
 
     def event_add(self, app):
         app.change_logged_screen("EventAdd")
+
+    def note_add(self, app):
+        app.change_logged_screen("NoteAdd")
 
 
 class OneDayLayoutClickable(GridLayout):

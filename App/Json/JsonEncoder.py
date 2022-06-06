@@ -9,4 +9,7 @@ class JsonEncoder(JSONEncoder):
             return text
 
     def default(self, o):
-        return {self.prepare(k): v for k, v in vars(o).items()}
+        try:
+            return {self.prepare(k): v for k, v in vars(o).items()}
+        except:
+            print(o)

@@ -24,7 +24,7 @@ class NotesManager:
 
     def add(self, note=None, title=None, text=None):
         if note is None:
-            id_ = JsonManager.generate_id()
+            id_ = str(JsonManager.generate_id())
             self.__notes[id_] = Note(title, text, id_)
             return True
         try:
