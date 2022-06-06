@@ -8,7 +8,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-from App.GUI.Buttons import PrimaryButton, UsersButton, TopButton, TitleButton, NoteButton, MenuButton
+from App.GUI.Buttons import PrimaryButton, UsersButton, TopButton, TitleButton, NoteButton, MenuButton, ScrollGrid
 
 from App.GUI.Event import EventInfo, SingleEvent, EventAdd
 
@@ -131,7 +131,7 @@ class NotesTable(GridLayout):
 
         self.add_widget(TitleButton(text="Notes"))
 
-        scroll_list = GridLayout(cols=1, size_hint_y=None)
+        scroll_list = ScrollGrid()
 
         id = 0
         for x in allNotesID:
@@ -174,8 +174,6 @@ class MenuPanel(BoxLayout):
         swap_view_button = PrimaryButton(text="Swap view", on_release=lambda _: self.swap_view(app))
         self.add_widget(swap_view_button)
 
-
-
     def opt1(self, app):
         self.dropdown.dismiss()
         app.profile_manager.save_profile()
@@ -190,7 +188,7 @@ class MenuPanel(BoxLayout):
         app.back_to_login()
 
     def swap_view(self, app):
-        app.profile_manager.actual_date =  app.profile_manager.actual_date
+        app.profile_manager.actual_date = app.profile_manager.actual_date
         app.changeBase()
         app.change_logged_screen("Base")
 
@@ -203,12 +201,10 @@ class OneDayLayoutClickable(GridLayout):
         super(OneDayLayoutClickable, self).__init__(**kw)
         self.cols = 1
         self.time = app.profile_manager.actual_date
-
         scrollable_events = ScrollView(do_scroll_x=False,
                                        do_scroll_y=True
         )
-        scroll_list = GridLayout(cols=1, size_hint_y=None, spacing=2, height=self.minimum_height)
-
+        scroll_list = ScrollGrid()
         if day != -1:
             week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -232,14 +228,11 @@ class OneDayLayoutClickable(GridLayout):
 
         scrollable_events.add_widget(scroll_list)
 
-        options_panel = GridLayout(size_hint_y=None, cols=1, height=50)
-
         self.swap_function = app.changeBase
         self.swap_function_2 = app.change_logged_screen
-        options_panel.add_widget(TitleButton(text=self.time.strftime("%d/%m/%y") + "\n" + self.time.strftime("%A"),
-                                             on_release=lambda _: self.swapFunction(app)))
 
-        self.add_widget(options_panel)
+        self.add_widget(TitleButton(text=self.time.strftime("%d/%m/%y") + "\n" + self.time.strftime("%A"),
+                                    on_release=lambda _: self.swapFunction(app)))
         self.add_widget(scrollable_events)
 
     def swapFunction(self, app):

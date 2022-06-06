@@ -1,5 +1,7 @@
 from kivy.lang import Builder
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
 
 kv = """
 <PrimaryButton@Button>:
@@ -65,7 +67,12 @@ kv = """
     width: 50
     background_normal: 'resources/menu_hamburger.png'
 
-    
+
+<ScrollGrid>:
+    size:(root.width, root.height)
+    size_hint_y: None
+    cols: 1
+    height: self.minimum_height
 """
 
 
@@ -83,5 +90,6 @@ class NoteButton(Button):
     pass
 class MenuButton(Button):
     pass
-
+class ScrollGrid(GridLayout):
+    pass
 Builder.load_string(kv)

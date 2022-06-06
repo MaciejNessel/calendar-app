@@ -10,7 +10,7 @@ from kivy.uix.textinput import TextInput
 from App.Json.JsonManager import JsonManager
 from App.GUI.Message import Message
 from App.GUI.Error import Error
-from App.GUI.Buttons import PrimaryButton, UsersButton
+from App.GUI.Buttons import PrimaryButton, UsersButton, ScrollGrid
 
 
 class SelectUser(Popup):
@@ -30,9 +30,7 @@ class SelectUser(Popup):
         self.add_widget(layout)
 
     def users_list(self):
-        layout = GridLayout(cols=1,
-                            size_hint_y=None,
-                            spacing=2)
+        layout = ScrollGrid(spacing=2)
         scroll_view = ScrollView()
         users = JsonManager.get_users()
         color_even = True
