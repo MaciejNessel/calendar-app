@@ -30,16 +30,27 @@ kv = """
 <EventButton@Button>:
     btn_color: .4,.4,.4,.2
     background_normal: ''
-    background_down: ''
-    background_color: 0, 1, 0, 1
-    text_size: self.size
+    is_header: False
+    text_size: root.width-cm(0.5), None
     canvas.before:
         Color:
             rgba: self.btn_color
         Rectangle:
             pos: self.pos
             size: self.size
-
+            
+<EventDetailsButton@Button>:
+    btn_color: .4,.4,.4,.2
+    background_normal: ''
+    is_header: False
+    text_size: root.width-cm(0.5), None
+    canvas.before:
+        Color:
+            rgba: self.btn_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            
 <TopButton@Button>:
     background_color: "#415a77"
     size_hint_y: None
@@ -76,8 +87,8 @@ kv = """
     background_normal: ''
     background_down: ''
     background_color: 0, 1, 0, 1
-    text_size: self.size
-    height: self.texture_size[1]
+    text_size: root.width-cm(0.3), None
+    height: self.texture_size[1]+cm(0.5)
     canvas.before:
         Color:
             rgba: self.btn_color
@@ -107,6 +118,8 @@ class UsersButton(Button):
     pass
 class EventButton(Button):
     pass
+class EventDetailsButton(Button):
+    pass
 class TopButton(Button):
     pass
 class TitleButton(Button):
@@ -117,4 +130,7 @@ class MenuButton(Button):
     pass
 class ScrollGrid(GridLayout):
     pass
+class NoteScrollGrid(ScrollGrid):
+    pass
+
 Builder.load_string(kv)

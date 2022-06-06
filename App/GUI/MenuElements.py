@@ -1,7 +1,6 @@
 from datetime import date, timedelta, datetime
 
 from kivy.factory import Factory
-from kivy.graphics import Color, Rectangle
 from kivy.uix.actionbar import ActionDropDown
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -29,8 +28,7 @@ class DayMenu(GridLayout):
         current_date_label = Label(text=current_date, size_hint_y=None, height=50, font_size='24sp', font_name="Lemonada")
         self.add_widget(current_date_label)
 
-
-        day_info = GridLayout(cols=3)
+        day_info = GridLayout(cols=3, spacing=10)
 
         left = GridLayout(cols=1)
         left.add_widget(TitleButton(text="Events", font_name="Lemonada"))
@@ -175,7 +173,8 @@ class NotesTable(GridLayout):
         self.cols = 1
         allNotesID = app.profile_manager.get_all_notes_id()
 
-        self.add_widget(TitleButton(text="Notes", font_name="Lemonada"))
+        header = TitleButton(text="Notes", font_name="Lemonada")
+        self.add_widget(header)
 
         scroll_list = ScrollGrid()
 
@@ -384,14 +383,11 @@ class WeekMenu(GridLayout):
         date_range_label = Label(text=left_range+" - "+right_range, size_hint_y=None, height=50, font_size='24sp', font_name="Lemonada")
         self.add_widget(date_range_label)
 
-        for x in range(3):
+        for x in range(7):
             week_grid.add_widget(OneDayLayoutClickable(app=app, day=x))
+
 
         week_grid.add_widget(NotesTable(app=app))
 
-        for x in range(3):
-            week_grid.add_widget(OneDayLayoutClickable(app=app, day=x + 3))
-
-        week_grid.add_widget(OneDayLayoutClickable(app=app, day=6))
 
         self.add_widget(week_grid)

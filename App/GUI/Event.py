@@ -1,8 +1,50 @@
+from kivy.factory import Factory
 from kivy.uix.colorpicker import ColorPicker
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 
 from App.GUI.Buttons import PrimaryButton, EventButton
+
+
+class EventEdit(Popup):
+    def __init__(self, app, event, **kw):
+        super(EventEdit, self).__init__(**kw)
+        self.event = event
+
+        self.size_hint = (.7, .7)
+        self.background_color = '#0d1b2a'
+        layout = GridLayout(cols=1,
+                            spacing=10,
+                            padding=20)
+
+        self.title_input = TextInput(text=event.get_title())
+        layout.add_widget(self.title_input)
+
+        self.short_desc_input = TextInput(text=event.get_short_desc())
+        layout.add_widget(self.short_desc_input)
+
+        self.desc_input = TextInput(text=event.get_desc())
+        layout.add_widget(self.desc_input)
+
+        self.main_btn = PrimaryButton(text='Accept', on_release=lambda x: self.edit_event(app))
+
+        layout.add_widget(self.main_btn)
+
+        back_btn = PrimaryButton(text='Back',
+                                 on_release=lambda x: self.dismiss())
+        layout.add_widget(back_btn)
+
+        self.add_widget(layout)
+
+    def edit_event(self, app):
+        self.dismiss()
+        self.event.set_title(str(self.title_input.text))
+        self.event.set_short_desc(str(self.short_desc_input.text))
+        self.event.set_desc(str(self.desc_input.text))
+        app.profile_manager.save_event(self.event)
+        app.change_logged_screen("Base")
 
 
 class EventInfo(GridLayout):
@@ -11,36 +53,22 @@ class EventInfo(GridLayout):
 
         self.cols = 1
 
-        if app.actualEvent != None:
-            event_id = app.actualEvent
+        event_id = app.actualEvent
 
-            self.event = app.profile_manager.get_event(event_id)
+        if not event_id:
+            return
 
-            title = self.event.get_title()
-            short_desc = self.event.get_short_desc()
-            desc = self.event.get_desc()
+        self.event = app.profile_manager.get_event(event_id)
 
-            self.title = TextInput()
-            self.title.text = title
-            self.add_widget(self.title)
+        self.title = self.event.get_title()
+        self.short_desc = self.event.get_short_desc()
+        self.desc = self.event.get_desc()
+        self.color = self.event.get_color()
 
-            self.short_desc = TextInput()
-            self.short_desc.text = short_desc
-            self.add_widget(self.short_desc)
-
-            self.desc = TextInput()
-            self.desc.text = desc
-            self.add_widget(self.desc)
-
-            self.add_widget(PrimaryButton(text="Save Changes", on_release=lambda x: self.edit_event(app)))
-
-    def edit_event(self, app):
-        self.event.set_title(str(self.title.text))
-        self.event.set_short_desc(str(self.short_desc.text))
-        self.event.set_desc(str(self.desc.text))
-        app.profile_manager.save_event(self.event)
-        app.change_logged_screen("Base")
-
+        self.add_widget(EventButton(text=self.title, background_color=self.color, font_size='24sp', size_hint_y=None, bold=True))
+        self.add_widget(EventButton(text=self.short_desc, background_color=self.color, size_hint_y=None))
+        self.add_widget(EventButton(text=self.desc, background_color=self.color, size_hint_y=None))
+        self.add_widget(PrimaryButton(text="Edit event", on_release=lambda x: Factory.EventEdit(app, self.event).open()))
 
 class SingleEvent(GridLayout):
     def __init__(self, app, event, time, **kw):
@@ -64,8 +92,10 @@ class SingleEvent(GridLayout):
         self.app = app
         self.time = time
 
-        self.add_widget(
-            EventButton(text=start + " - " + end, on_release=lambda x: self.onrel(), background_color=color, bold=True))
+        header = EventButton(text=start + " - " + end, on_release=lambda x: self.onrel(), background_color=color,
+                             bold=True)
+        header.is_header=True
+        self.add_widget(header)
         self.add_widget(EventButton(text=title, on_release=lambda x: self.onrel(), background_color=color, bold=True))
         self.add_widget(EventButton(text=short_desc, on_release=lambda x: self.onrel(), background_color=color))
 
