@@ -12,8 +12,8 @@ class NotesManager:
         self.__notes.clear()
         data = self.__json_manager.get_notes()
         for note in data:
-            new_note = Note(note.get('title'), note.get('text'), note.get('id_'))
-            self.__notes.update({note.get('id_'): new_note})
+            new_note = Note(note.get('title'), note.get('text'), note.get('id'))
+            self.__notes.update({note.get('id'): new_note})
 
     def get(self, id_):
         result = self.__notes.get(id_)
