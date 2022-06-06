@@ -9,6 +9,7 @@ class NotesManager:
         self.__json_manager = json_manager
 
     def load(self):
+        self.__notes.clear()
         data = self.__json_manager.get_notes()
         for note in data:
             new_note = Note(note.get('title'), note.get('text'), note.get('id_'))

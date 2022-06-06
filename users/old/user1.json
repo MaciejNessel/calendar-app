@@ -6,14 +6,16 @@
       "short_desc": "shortDesc1",
       "desc": "description1",
       "id_": "8857fcab-b676-11ec-9fde-d45d645a64b7",
-      "notes_id": []
+      "notes_id": [],
+      "color": "#ffb703"
     },
     {
       "title": "wydarzenie2",
       "short_desc": "shortDesc2",
       "desc": "description2",
       "id_": "54584d05-b677-11ec-89d7-d45d645a64b7",
-      "notes_id": []
+      "notes_id": [],
+      "color": "#8338ec"
     }
   ],
   "noteDetails": [
@@ -25,7 +27,7 @@
   ],
   "dataPerDay": [
     {
-      "date": "2022-06-02",
+      "date": "2022-06-06",
       "events": [
         {
           "id_": "54584d05-b677-11ec-89d7-d45d645a64b7",
@@ -36,6 +38,16 @@
           "id_": "8857fcab-b676-11ec-9fde-d45d645a64b7",
           "start": "15:00",
           "end": "16:00"
+        },
+        {
+          "id_": "54584d05-b677-11ec-89d7-d45d645a64b7",
+          "start": "16:00",
+          "end": "17:00"
+        },
+        {
+          "id_": "8857fcab-b676-11ec-9fde-d45d645a64b7",
+          "start": "18:00",
+          "end": "19:00"
         }
       ],
       "notes": [

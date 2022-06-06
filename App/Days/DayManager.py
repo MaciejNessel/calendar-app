@@ -8,6 +8,7 @@ class DayManager:
 
     # Load days that have events
     def load(self):
+        self.__days.clear()
         data = self.__json_manager.get_data_per_days()
         for day in data:
             new_day = Day(day.get('date'), day.get('events'), day.get('notes'))
