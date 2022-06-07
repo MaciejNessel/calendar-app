@@ -123,10 +123,12 @@ class NoteInfo(GridLayout):
 
         self.cols = 1
 
-        note = app.profile_manager.get_note(id)
+        self.note = app.profile_manager.get_note(id)
 
-        title = note.get_title()
-        description = note.get_text()
+        
+
+        title = self.note.get_title()
+        description = self.note.get_text()
 
         self.add_widget(Label(text=title))
         self.add_widget(Label(text=description))
@@ -137,10 +139,15 @@ class NoteInfo(GridLayout):
         buttons.cols = 3
         buttons.add_widget(PrimaryButton(text="Edit", on_release=lambda x: app.change_logged_screen("NoteEdit", id=id)))
         buttons.add_widget(
-            PrimaryButton(text="Delete", on_release=lambda x: app.change_logged_screen("NoteEdit", id=id)))
+            PrimaryButton(text="Delete", on_release=lambda x: self.delete(app)))
         buttons.add_widget(PrimaryButton(text="Cancel", on_release=lambda x: app.change_logged_screen("Base")))
 
         self.add_widget(buttons)
+
+    def delete(self, app):
+        app.profile_manager.delete_note(self.note)
+
+        app.change_logged_screen("Base")
 
 
 class Note(GridLayout):
