@@ -54,7 +54,7 @@ class EventInfo(GridLayout):
 
         self.cols = 1
         event_id = app.actualEvent
-        if not event_id:
+        if not event_id or event_id == None:
             return
 
         self.event = app.profile_manager.get_event(event_id)
@@ -96,6 +96,9 @@ class SingleEvent(GridLayout):
         self.height = 75
 
         event_ = app.profile_manager.get_event(event_id)
+
+        if event_ == None:
+            return
 
         title = event_.get_title()
         self.time = app.profile_manager.actual_date
