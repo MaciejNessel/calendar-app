@@ -6,7 +6,8 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 
-from App.GUI.Buttons import PrimaryButton, EventButton
+from App.GUI.Buttons import PrimaryButton, EventButton, ColorButton, DatesButton
+import re
 
 
 class EventEdit(Popup):
@@ -64,14 +65,16 @@ class EventInfo(GridLayout):
         self.desc = self.event.get_desc()
         self.color = self.event.get_color()
 
-        self.add_widget(EventButton(text=self.title, background_color=self.color, font_size='24sp', size_hint_y=None, bold=True))
+        self.add_widget(
+            EventButton(text=self.title, background_color=self.color, font_size='24sp', size_hint_y=None, bold=True))
         self.add_widget(EventButton(text=self.short_desc, background_color=self.color, size_hint_y=None))
         self.add_widget(EventButton(text=self.desc, background_color=self.color, size_hint_y=None))
-        
+
         buttons = GridLayout()
         buttons.cols = 2
-        
-        buttons.add_widget(PrimaryButton(text="Edit event", on_release=lambda x: Factory.EventEdit(app, self.event).open()))
+
+        buttons.add_widget(
+            PrimaryButton(text="Edit event", on_release=lambda x: Factory.EventEdit(app, self.event).open()))
         buttons.add_widget(PrimaryButton(text="Delete event", on_release=lambda x: self.delete(app)))
 
         self.add_widget(buttons)
@@ -82,6 +85,7 @@ class EventInfo(GridLayout):
         app.profile_manager.delete_event(self.event)
 
         app.change_logged_screen("Base")
+
 
 class SingleEvent(GridLayout):
     def __init__(self, app, event, time, **kw):
@@ -110,7 +114,7 @@ class SingleEvent(GridLayout):
 
         header = EventButton(text=start + " - " + end, on_release=lambda x: self.onrel(), background_color=color,
                              bold=True)
-        header.is_header=True
+        header.is_header = True
         self.add_widget(header)
         self.add_widget(EventButton(text=title, on_release=lambda x: self.onrel(), background_color=color, bold=True))
         self.add_widget(EventButton(text=short_desc, on_release=lambda x: self.onrel(), background_color=color))
@@ -125,7 +129,7 @@ class SingleEvent(GridLayout):
 class EventAdd(GridLayout):
     def __init__(self, app, **kwargs):
         super(EventAdd, self).__init__(**kwargs)
-        self.color = "#59a8ffa5"
+        self.color = "black"
         self.cols = 1
         self.spacing = 10
         self.padding = 20
@@ -133,9 +137,8 @@ class EventAdd(GridLayout):
         title = "title"
         short_desc = "short_desc"
         desc = "full desc"
-        date = str(app.profile_manager.actual_date.strftime("%x"))
-        start = "00:00"
-        end = "24:00"
+
+        self.dates = []
 
         self.title = TextInput(size_hint_y=None, height=40)
         self.title.text = title
@@ -149,22 +152,14 @@ class EventAdd(GridLayout):
         self.desc.text = desc
         self.add_widget(self.desc)
 
-        self.date = TextInput(size_hint_y=None, height=40)
-        self.date.text = date
-        self.add_widget(self.date)
+        color_button = ColorButton(text="Change color", background_color=self.color)
+        color_button.bind(on_release=lambda _: self.color_popup(color_button))
+        self.add_widget(color_button)
 
-        self.start = TextInput(size_hint_y=None, height=40)
-        self.start.text = start
-        self.add_widget(self.start)
-
-        self.end = TextInput(size_hint_y=None, height=40)
-        self.end.text = end
-        self.add_widget(self.end)
-
-        clr_picker = ColorPicker()
-        self.add_widget(clr_picker)
-
-        clr_picker.bind(color=self.on_color)
+        date_button = PrimaryButton(text="Add date", on_release=lambda _: self.date_popup(app))
+        self.dates_layout = GridLayout(cols=10)
+        self.add_widget(date_button)
+        self.add_widget(self.dates_layout)
 
         buttons = GridLayout()
         buttons.cols = 2
@@ -174,15 +169,20 @@ class EventAdd(GridLayout):
         self.add_widget(buttons)
 
     def add(self, app):
-        self.date.text = self.date.text.replace(" ", "")
-        dates = self.date.text.split(",")
-        # create event, eventy dla dnia sa w dict o id rownych iod wydarzeń
         event_id = app.profile_manager.event_manager.add(title=self.title.text, short_desc=self.short_desc.text,
                                                          desc=self.desc.text, color=self.color)
-        for date in dates:
-            # add to day list
-            app.profile_manager.day_manager.add_event_to_day(date=date, event_id=event_id, start=self.start.text,
-                                                         end=self.end.text)
+        for el in self.dates:
+            date = el.get('date')
+            start = el.get('start')
+            end = el.get('end')
+            if not (date and start and end):
+                return
+            app.profile_manager.day_manager.add_event_to_day(date=date, event_id=event_id, start=start,
+                                                             end=end)
+        if len(self.dates) < 1:
+            Factory.Error(text="Add at least one date").open()
+            return
+
         self.back(app)
 
     def back(self, app):
@@ -191,3 +191,81 @@ class EventAdd(GridLayout):
     # To monitor changes, we can bind to color property changes
     def on_color(self, instance, value):
         self.color = str(instance.hex_color)
+
+    def color_popup(self, color_button):
+        def set_color():
+            popup.dismiss()
+            self.color = clr_picker.color
+            color_button.background_color = self.color
+
+        popup = Popup()
+        layout = GridLayout(cols=1)
+
+        clr_picker = ColorPicker()
+        clr_picker.bind(color=self.on_color)
+        layout.add_widget(clr_picker)
+
+        set_button = PrimaryButton(text="Accept", on_release=lambda _: set_color())
+        layout.add_widget(set_button)
+
+        popup.add_widget(layout)
+        popup.open()
+
+    def date_popup(self, app):
+        def remove_date(dates_button, to_add):
+            self.dates_layout.remove_widget(dates_button)
+            self.dates.remove(to_add)
+
+        def add_date():
+            to_add = {"date": date.text, "start": start.text, "end": end.text}
+
+            if to_add in self.dates:
+                Factory.Error(text="The date has been entered previously").open()
+                return
+            if not self.date_validate(to_add):
+                Factory.Error(text="Enter a valid data format. \n Date: YYYY-MM-DD \n Start, End: HH:MM").open()
+                return
+            self.dates.append(to_add)
+            dates_button = DatesButton(text=date.text + "\n" + start.text + " - " + end.text)
+            dates_button.bind(on_release=lambda _: remove_date(dates_button, to_add))
+            self.dates_layout.add_widget(dates_button)
+            popup.dismiss()
+
+        popup = Popup()
+        layout = GridLayout(cols=1)
+
+        date = TextInput(size_hint_y=None, height=40)
+        date.text = str(app.profile_manager.actual_date.strftime("%Y-%m-%d"))
+        layout.add_widget(date)
+
+        start = TextInput(size_hint_y=None, height=40)
+        start.text = "00:00"
+        layout.add_widget(start)
+
+        end = TextInput(size_hint_y=None, height=40)
+        end.text = "00:00"
+        layout.add_widget(end)
+
+        accept_button = PrimaryButton(text="Accept", on_release=lambda _: add_date())
+        layout.add_widget(accept_button)
+
+        back_button = PrimaryButton(text="Back", on_release=lambda _: popup.dismiss())
+        layout.add_widget(back_button)
+
+        popup.add_widget(layout)
+        popup.open()
+
+    def date_validate(self, to_validate):
+        date = to_validate.get('date')
+        start = to_validate.get('start')
+        end = to_validate.get('end')
+
+        if not re.search("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", date) \
+                or not re.search("^[0-1][0-9]:[0-5][0-9]$", start) \
+                or not re.search("^[0-1][0-9]:[0-5][0-9]$", end):
+            return False
+
+        if start > end:
+            return False
+
+        return True

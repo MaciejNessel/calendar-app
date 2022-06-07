@@ -109,6 +109,23 @@ kv = """
     cols: 1
     height: self.minimum_height
     spacing: 5
+    
+<ColorButton@Button>:
+    size_hint_y: None
+    btn_color: .4,.4,.4,.2
+    background_normal: ''
+    background_down: ''
+    background_color: 0, 1, 0, 1
+    canvas.before:
+        Color:
+            rgba: self.btn_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            
+<DatesButton@Button>:
+    size_hint: None, None
+    
 """
 
 
@@ -132,5 +149,10 @@ class ScrollGrid(GridLayout):
     pass
 class NoteScrollGrid(ScrollGrid):
     pass
+class ColorButton(Button):
+    pass
+class DatesButton(Button):
+    pass
+
 
 Builder.load_string(kv)

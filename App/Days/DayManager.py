@@ -22,8 +22,6 @@ class DayManager:
                 "end": end
             }
 
-        date = "20" + date.split("/")[2] + "-" + date.split("/")[0] + "-" + date.split("/")[1]
-
         if self.get_day(date=date) == None:
             new_day = Day(date, events_=[], notes=[])
             new_day.add_event_to_day(event=event_info)
