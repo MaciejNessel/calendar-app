@@ -174,13 +174,14 @@ class EventAdd(GridLayout):
         self.add_widget(buttons)
 
     def add(self, app):
-        # todo: data validation
-
+        self.date.text = self.date.text.replace(" ", "")
+        dates = self.date.text.split(",")
         # create event, eventy dla dnia sa w dict o id rownych iod wydarzeń
         event_id = app.profile_manager.event_manager.add(title=self.title.text, short_desc=self.short_desc.text,
                                                          desc=self.desc.text, color=self.color)
-        # add to day list
-        app.profile_manager.day_manager.add_event_to_day(date=self.date.text, event_id=event_id, start=self.start.text,
+        for date in dates:
+            # add to day list
+            app.profile_manager.day_manager.add_event_to_day(date=date, event_id=event_id, start=self.start.text,
                                                          end=self.end.text)
         self.back(app)
 

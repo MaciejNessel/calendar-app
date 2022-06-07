@@ -58,6 +58,15 @@ class DayManager:
         else:
             return self.__days.get(date)
 
+    def delete_event(self, event_id):
+        to_remove = []
+        for x in self.__days.keys():
+            if self.__days[x].delete_event(event_id):
+                to_remove.append(x)
+
+        for x in to_remove:
+            self.__days.pop(x)
+
     # save days to JSON file
     def save(self):
         result = {"dataPerDay": []}

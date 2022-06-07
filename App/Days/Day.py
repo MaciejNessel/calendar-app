@@ -21,5 +21,21 @@ class Day:
     def get_notes(self):
         return self.__notes
 
+    def delete_event(self, event_id):
+        to_remove = None
+        for x in self.__events:
+            if x["id_"] == event_id:
+                to_remove = x
+                break
+        
+        if to_remove == None:
+            return False
+        
+        self.__events.remove(x)
+
+        if len(self.__events) == 0:
+            return True
+        return False
+
     def to_json(self):
         return json.dumps(self, cls=JsonEncoder, indent=2)
