@@ -50,7 +50,7 @@ class JsonManager:
         users_from_file['users'] = users_list
 
         try:
-            os.remove(FILES_DIR + "users/"+user_id+".json")
+            os.remove(FILES_DIR + "users/" + user_id + ".json")
             with open(FILES_DIR + "users/users_list.json", "w") as outfile:
                 outfile.write(json.dumps(users_from_file))
         except FileNotFoundError:
@@ -187,12 +187,12 @@ class JsonManager:
         if not users_list:
             users_file = open(FILES_DIR + "users/users_list.json", "w")
             users_list = {"users": []}
-
-
+        user_list_old = self.get_users()
         for user in r.get("user_data", {}):
             username = user.get('username')
-            new_username = self.check_nick(username)
+            new_username = self.check_nick(username, user_list_old)
             users_list.get('users').append({'username': new_username})
+            user_list_old.append({'username': new_username})
             with open(FILES_DIR + "/users/" + new_username + ".json", 'w') as f:
                 json.dump(user, f, indent=2)
 
@@ -201,18 +201,17 @@ class JsonManager:
 
         return True
 
-    def check_nick(self, user_id):
-        user_list = self.get_users()
+    def check_nick(self, user_id, user_list):
         for user in user_list:
             if user.get('username', '') == user_id:
                 user_id += "C"
-                return self.check_nick(user_id)
+                return self.check_nick(user_id, user_list)
 
         return user_id
 
     @staticmethod
-    def prepare_data_to_export():
-        users_list = JsonManager.get_json_from_file(filepath=FILES_DIR+"/users/users_list.json",
+    def prepare_data_to_export(username_to_export=None):
+        users_list = JsonManager.get_json_from_file(filepath=FILES_DIR + "/users/users_list.json",
                                                     error="Reading file users_list.json failed.")
         if not users_list:
             return False
@@ -224,6 +223,8 @@ class JsonManager:
 
         for users in users_list.get('users'):
             username = users.get('username')
+            if username_to_export and username != username_to_export:
+                continue
             user_json = JsonManager.get_json_from_file(filepath=FILES_DIR + "/users/" + username + ".json")
             if not user_json:
                 continue
@@ -235,6 +236,17 @@ class JsonManager:
     @staticmethod
     def export_data():
         users_data_to_export = JsonManager.prepare_data_to_export()
+        url = None
+        if users_data_to_export:
+            r = requests.post('https://jsonblob.com/api/jsonBlob',
+                              data=json.dumps(users_data_to_export),
+                              headers={"Content-Type": "application/json", "Accept": "application/json"})
+            url = r.headers.get('Location')
+        return url
+
+    @staticmethod
+    def export_profile(user_name):
+        users_data_to_export = JsonManager.prepare_data_to_export(user_name)
         url = None
         if users_data_to_export:
             r = requests.post('https://jsonblob.com/api/jsonBlob',

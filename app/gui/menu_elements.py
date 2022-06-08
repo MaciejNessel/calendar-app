@@ -91,6 +91,7 @@ class MenuPanel(BoxLayout):
         self.dropdown.add_widget(TopButton(text="Save", on_release=lambda x: self.save_profile(app)))
         self.dropdown.add_widget(TopButton(text="Reset", on_release=lambda x: self.reset_profile(app)))
         self.dropdown.add_widget(TopButton(text="Back", on_release=lambda x: self.back(app)))
+        self.dropdown.add_widget(TopButton(text="Export", on_release=lambda x: self.export_profile(app)))
 
         dropdown_btn = MenuButton()
 
@@ -122,6 +123,10 @@ class MenuPanel(BoxLayout):
     def reset_function(self, app):
         app.profile_manager.load_user_data()
         app.change_logged_screen("Base")
+
+    def export_profile(self, app):
+        url = app.profile_manager.export_profile()
+        Factory.MessageCopy(text="Exported successfully", copy=url).open()
 
     def back(self, app):
         self.dropdown.dismiss()

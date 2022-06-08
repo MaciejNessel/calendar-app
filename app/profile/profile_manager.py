@@ -22,6 +22,10 @@ class ProfileManager:
     def save_profile(self):
         self.json_manager.save(self.note_manager, self.event_manager, self.day_manager)
 
+    def export_profile(self):
+        self.save_profile()
+        return self.json_manager.export_profile(self.username)
+
     def load_user_data(self):
         self.json_manager.load_data(self.username)
         self.event_manager.load()
