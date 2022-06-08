@@ -57,10 +57,12 @@ class DayManager:
         else:
             return self.__days.get(date)
 
-    def delete_event(self, event_id):
+    def delete_event(self, event_id, date=None, start=None, end=None):
         to_remove = []
         for x in self.__days.keys():
-            if self.__days[x].delete_event(event_id):
+            if self.__days[x].get_date() != date:
+                continue
+            if self.__days[x].delete_event(event_id, start, end):
                 to_remove.append(x)
 
         for x in to_remove:

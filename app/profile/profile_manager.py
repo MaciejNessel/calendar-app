@@ -18,6 +18,8 @@ class ProfileManager:
         self.username = username
         self.load_user_data()
         self.actual_date = datetime.now()
+        self.start = "00:00"
+        self.end = "00:00"
 
     def save_profile(self):
         self.json_manager.save(self.note_manager, self.event_manager, self.day_manager)
@@ -37,12 +39,19 @@ class ProfileManager:
     def set_actual_date(self, new_date):
         self.actual_date = new_date
 
+    def set_actual_hours(self, start, end):
+        self.start = start
+        self.end = end
+
     def change_actual_date(self, days):
         self.actual_date += timedelta(days=days)
 
     def get_date(self):
         return self.actual_date
-    
+
+    def get_hours(self):
+        return self.start, self.end
+
     def get_date_range(self):
         actual_date_temp = self.actual_date
         actual_date_temp -= timedelta(days=actual_date_temp.weekday())
@@ -77,6 +86,8 @@ class ProfileManager:
         self.day_manager.delete_event(event.get_id())
         self.event_manager.delete(event.get_id())
 
+    def delete_event_one(self, event, date, start, end):
+        self.day_manager.delete_event(event.get_id(), date, start, end)
     # day methods
 
     def get_day(self, day=None, month=None, year=None, date=None):

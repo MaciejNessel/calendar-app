@@ -62,6 +62,7 @@ class EventInfo(GridLayout):
         self.event = app.profile_manager.get_event(event_id)
 
         actual_date = str(app.profile_manager.get_date()).split(" ")[0]
+        actual_start, actual_end = app.profile_manager.get_hours()
 
         if not app.profile_manager.is_event_in_day(event_id=event_id, date=actual_date):
             return
@@ -76,12 +77,13 @@ class EventInfo(GridLayout):
         self.add_widget(EventButton(text=self.short_desc, background_color=self.color, size_hint_y=None))
         self.add_widget(EventButton(text=self.desc, background_color=self.color, size_hint_y=None))
 
-        buttons = GridLayout()
-        buttons.cols = 2
+        buttons = GridLayout(size_hint_y=None)
+        buttons.cols = 4
 
-        buttons.add_widget(
-            PrimaryButton(text="Edit event", on_release=lambda x: Factory.EventEdit(app, self.event).open()))
-        buttons.add_widget(PrimaryButton(text="Delete event", on_release=lambda x: self.delete(app)))
+        buttons.add_widget(ColorButton(text="Edit", on_release=lambda x: Factory.EventEdit(app, self.event).open()))
+        buttons.add_widget(ColorButton(text="Delete\n  all", on_release=lambda x: self.delete(app)))
+        buttons.add_widget(ColorButton(text="Delete\n  one", on_release=lambda x: self.delete_one(app, actual_date, actual_start, actual_end)))
+        buttons.add_widget(ColorButton(text="Add\ndate", on_release=lambda x: self.add_date_popup(app)))
 
         self.add_widget(buttons)
 
@@ -92,22 +94,64 @@ class EventInfo(GridLayout):
 
         app.change_logged_screen("Base")
 
+    def delete_one(self, app, date, start, end):
+        app.actual_event = None
+        app.profile_manager.delete_event_one(self.event, date, start, end)
+        app.change_logged_screen("Base")
+
+    def add_date_popup(self, app):
+        popup = Popup(background="", background_color="#0d1b2a", title="Enter date", size_hint=[.7, .7])
+        layout = GridLayout(cols=1)
+
+        date_input = TextInput(text=str(app.profile_manager.actual_date.strftime("%Y-%m-%d")))
+        layout.add_widget(Label(text="Date", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
+        layout.add_widget(date_input)
+
+        start_input = TextInput(text="00:00")
+        layout.add_widget(Label(text="Start hour", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
+        layout.add_widget(start_input)
+
+        end_input = TextInput(text="00:00")
+        layout.add_widget(Label(text="End hour", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
+        layout.add_widget(end_input)
+
+        layout.add_widget(PrimaryButton(text="Confirm",
+                                        on_release=lambda _: self.add_date(app, date_input, start_input, end_input,
+                                                                           popup)))
+
+        layout.add_widget(PrimaryButton(text="Back", on_release=lambda _: popup.dismiss()))
+
+        popup.add_widget(layout)
+        popup.open()
+
+    def add_date(self, app, date_input, start_input, end_input, popup):
+        date = {
+            'date': date_input.text,
+            'start': start_input.text,
+            'end': end_input.text
+        }
+        if not date_validate(date):
+            Factory.Error(text="Wrong date format").open()
+            return
+        app.profile_manager.add_event_to_day(date.get('date', ''), app.actual_event, date.get('start', ''),
+                                             date.get('end', ''))
+        Factory.Message(text="Date was successfully added").open()
+        app.change_logged_screen("Base")
+        popup.dismiss()
+
 
 class SingleEvent(GridLayout):
     def __init__(self, app, event, time, **kw):
         super(SingleEvent, self).__init__(**kw)
-
         self.cols = 1
-
         event_id = event["id_"]
-        start = event["start"]
-        end = event["end"]
+        self.start = event["start"]
+        self.end = event["end"]
         self.size_hint_y = None
         self.height = 75
 
         event_ = app.profile_manager.get_event(event_id)
-
-        if event_ == None:
+        if not event_:
             return
 
         title = event_.get_title()
@@ -118,7 +162,7 @@ class SingleEvent(GridLayout):
         self.app = app
         self.time = time
 
-        header = EventButton(text=start + " - " + end, on_release=lambda x: self.onrel(), background_color=color,
+        header = EventButton(text=self.start + " - " + self.end, on_release=lambda x: self.onrel(), background_color=color,
                              bold=True)
         header.is_header = True
         self.add_widget(header)
@@ -128,6 +172,7 @@ class SingleEvent(GridLayout):
     def onrel(self):
         self.app.actual_event = self.id
         self.app.profile_manager.set_actual_date(self.time)
+        self.app.profile_manager.set_actual_hours(self.start, self.end)
         self.app.set_base("DayMenu")
         self.app.change_logged_screen("Base")
 
@@ -149,7 +194,8 @@ class EventAdd(GridLayout):
 
         self.short_desc = TextInput(size_hint_y=None, height=40)
         self.short_desc.text = "short_desc"
-        self.add_widget(Label(text="Short description", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
+        self.add_widget(
+            Label(text="Short description", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         self.add_widget(self.short_desc)
 
         self.desc = TextInput(size_hint_y=None, height=60)
@@ -195,7 +241,7 @@ class EventAdd(GridLayout):
             if not (date and start and end):
                 return
             app.profile_manager.add_event_to_day(date=date, event_id=event_id, start=start,
-                                                             end=end)
+                                                 end=end)
         if len(self.dates) < 1:
             Factory.Error(text="Add at least one date").open()
             return
@@ -239,7 +285,7 @@ class EventAdd(GridLayout):
             if to_add in self.dates:
                 Factory.Error(text="The date has been entered previously").open()
                 return
-            if not self.date_validate(to_add):
+            if not date_validate(to_add):
                 Factory.Error(text="Enter a valid data format. \n Date: YYYY-MM-DD \n Start, End: HH:MM").open()
                 return
             self.dates.append(to_add)
@@ -248,7 +294,7 @@ class EventAdd(GridLayout):
             self.dates_layout.add_widget(dates_button)
             popup.dismiss()
 
-        popup = Popup(title="Add date",  background="", background_color="#0d1b2a")
+        popup = Popup(title="Add date", background="", background_color="#0d1b2a")
         layout = GridLayout(cols=1, spacing=30)
 
         date = TextInput(size_hint_y=None, height=40)
@@ -279,21 +325,6 @@ class EventAdd(GridLayout):
         popup.add_widget(layout)
         popup.open()
 
-    def date_validate(self, to_validate):
-        date = to_validate.get('date')
-        start = to_validate.get('start')
-        end = to_validate.get('end')
-
-        if not re.search("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", date) \
-                or not re.search("^[0-2][0-9]:[0-5][0-9]$", start) \
-                or not re.search("^[0-2][0-9]:[0-5][0-9]$", end):
-            return False
-
-        if start > end:
-            return False
-
-        return True
-
     def data_validation(self):
         if len(self.title.text) > 25:
             Factory.Error(text="The title entered is too long. \n Maximum length: 25").open()
@@ -308,3 +339,22 @@ class EventAdd(GridLayout):
             return False
 
         return True
+
+
+def date_validate(to_validate):
+    try:
+        date = to_validate.get('date')
+        start = to_validate.get('start')
+        end = to_validate.get('end')
+    except AttributeError:
+        return False
+
+    if not re.search("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", date) \
+            or not re.search("^[0-2][0-9]:[0-5][0-9]$", start) \
+            or not re.search("^[0-2][0-9]:[0-5][0-9]$", end):
+        return False
+
+    if start > end:
+        return False
+
+    return True

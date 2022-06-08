@@ -90,8 +90,8 @@ class MenuPanel(BoxLayout):
         self.dropdown.container.spacing = -3
         self.dropdown.add_widget(TopButton(text="Save", on_release=lambda x: self.save_profile(app)))
         self.dropdown.add_widget(TopButton(text="Reset", on_release=lambda x: self.reset_profile(app)))
-        self.dropdown.add_widget(TopButton(text="Back", on_release=lambda x: self.back(app)))
         self.dropdown.add_widget(TopButton(text="Export", on_release=lambda x: self.export_profile(app)))
+        self.dropdown.add_widget(TopButton(text="Back", on_release=lambda x: self.back(app)))
 
         dropdown_btn = MenuButton()
 

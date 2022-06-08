@@ -114,7 +114,7 @@ kv = """
     btn_color: .4,.4,.4,.2
     background_normal: ''
     background_down: ''
-    background_color: 0, 1, 0, 1
+    background_color: utils.get_color_from_hex("#1b263b")
     canvas.before:
         Color:
             rgba: self.btn_color

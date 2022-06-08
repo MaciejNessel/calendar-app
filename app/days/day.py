@@ -20,10 +20,12 @@ class Day:
     def get_notes(self):
         return self.__notes
 
-    def delete_event(self, event_id):
+    def delete_event(self, event_id, start=None, end=None):
         to_remove = None
         for x in self.__events:
             if x.get("id_", None) == event_id:
+                if (start or end) and not (x.get("start", None) == start and x.get("end", None) == end):
+                    continue
                 to_remove = x
                 break
 
@@ -39,3 +41,6 @@ class Day:
 
     def to_json(self):
         return json.dumps(self, cls=JsonEncoder, indent=2)
+
+    def get_date(self):
+        return self.__date
