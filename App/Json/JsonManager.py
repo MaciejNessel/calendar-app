@@ -1,4 +1,5 @@
 import json
+import os
 import uuid
 from shutil import copyfile
 
@@ -32,6 +33,29 @@ class JsonManager:
             with open(FILES_DIR + "users/users_list.json", "w") as outfile:
                 outfile.write(json_object)
             return []
+
+    @staticmethod
+    def remove_user(user_id):
+        try:
+            users_file = open(FILES_DIR + "users/users_list.json")
+            users_from_file = json.load(users_file)
+            users_file.close()
+        except FileNotFoundError:
+            print("File users_list.json doesn't exist!")
+            return False
+
+        users_list = users_from_file.get('users', [])
+        users_list = [i for i in users_list if not (i.get('username') == user_id)]
+        users_from_file['users'] = users_list
+
+        try:
+            os.remove(FILES_DIR + "users/"+user_id+".json")
+            with open(FILES_DIR + "users/users_list.json", "w") as outfile:
+                outfile.write(json.dumps(users_from_file))
+        except FileNotFoundError:
+            return False
+
+        return True
 
     def load_data(self, username):
         try:

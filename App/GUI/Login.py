@@ -98,6 +98,51 @@ class NewUser(LoginPopup):
         else:
             Factory.Error(result[1]).open()
 
+class RemoveUser(Popup):
+    def __init__(self, app, **kw):
+        super(RemoveUser, self).__init__(**kw)
+        self.app = app
+        self.size_hint = (.7, .7)
+        self.background = ""
+        self.background_color = "#0d1b2a"
+        layout = GridLayout(cols=1)
+        layout.padding = 20
+        layout.spacing = 20
+        self.title = "Remove user"
+        back_btn = PrimaryButton(text='Back',
+                                 on_release=lambda x: self.dismiss())
+        back_btn.size_hint = (1, .2)
+        layout.add_widget(self.users_list())
+        layout.add_widget(back_btn)
+        self.add_widget(layout)
+
+    def users_list(self):
+        layout = ScrollGrid(spacing=2)
+        scroll_view = ScrollView()
+        users = JsonManager.get_users()
+        color_even = True
+        for user in users:
+            btn = UsersButton(text=user.get('username'),
+                              on_release=lambda instance: Factory.ConfirmPopup(text="The data cannot be recovered.",
+                                                                               function=self.remove_user,
+                                                                               app=instance).open())
+            btn.size_hint = (1, None)
+            btn.size = (1, 30)
+            if color_even:
+                btn.btn_color = (0, 0, 0, 0)
+            color_even = not color_even
+            layout.add_widget(btn)
+
+        scroll_view.add_widget(layout)
+        return scroll_view
+
+    def remove_user(self, instance):
+        self.dismiss()
+        success = self.app.json_manager.remove_user(instance.text)
+        if success:
+            Factory.Message(text="User deleted successfully").open()
+        else:
+            Factory.Error(text="An error occurred while deleting").open()
 
 class ImportData(LoginPopup):
     def __init__(self, app, **kw):
@@ -144,6 +189,8 @@ class Login(GridLayout):
                                         on_release=lambda x: Factory.SelectUser(app).open())
         new_user_btn = PrimaryButton(text='Add new user',
                                      on_release=lambda x: Factory.NewUser(app).open())
+        remove_user_btn = PrimaryButton(text='Remove user',
+                                        on_release=lambda x: Factory.RemoveUser(app).open())
         import_btn = PrimaryButton(text='Import data',
                                    on_release=lambda x: Factory.ImportData(app).open())
         export_btn = PrimaryButton(text='Export data',
@@ -151,5 +198,6 @@ class Login(GridLayout):
         self.add_widget(Label(text="Calendar App", font_size=50, font_name="Lemonada"))
         self.add_widget(select_user_btn)
         self.add_widget(new_user_btn)
+        self.add_widget(remove_user_btn)
         self.add_widget(import_btn)
         self.add_widget(export_btn)
