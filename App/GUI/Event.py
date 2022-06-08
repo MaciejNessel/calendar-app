@@ -280,8 +280,8 @@ class EventAdd(GridLayout):
         end = to_validate.get('end')
 
         if not re.search("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", date) \
-                or not re.search("^[0-1][0-9]:[0-5][0-9]$", start) \
-                or not re.search("^[0-1][0-9]:[0-5][0-9]$", end):
+                or not re.search("^[0-2][0-9]:[0-5][0-9]$", start) \
+                or not re.search("^[0-2][0-9]:[0-5][0-9]$", end):
             return False
 
         if start > end:
