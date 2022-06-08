@@ -2,8 +2,10 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.uix.screenmanager import ScreenManager, NoTransition, Screen
+from App.GUI.Event import EventAdd
 from App.GUI.Login import Login
 from App.GUI.MenuElements import *
+from App.GUI.Note import NoteAdd, NoteEdit, NoteInfo
 from App.Json.JsonManager import JsonManager
 from App.Profile.ProfileManager import ProfileManager
 
@@ -17,7 +19,7 @@ class MyApp(App):
         self.json_manager = JsonManager()
         self.profile_manager = None
         self.base = "WeekMenu"
-        self.actualEvent = None
+        self.actual_event = None
 
     def build(self):
         Window.clearcolor = "#0d1b2a"
@@ -87,5 +89,4 @@ class MyApp(App):
         self.base = base
 
     def reset_actual_event(self):
-        self.actualEvent = None
-
+        self.actual_event = None

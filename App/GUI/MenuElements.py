@@ -10,10 +10,10 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-from App.GUI.Buttons import PrimaryButton, UsersButton, TopButton, TitleButton, NoteButton, MenuButton, ScrollGrid, \
-    ColorButton
+from App.GUI.Buttons import PrimaryButton, TopButton, TitleButton, MenuButton, ScrollGrid
 
-from App.GUI.Event import EventInfo, SingleEvent, EventAdd
+from App.GUI.Event import EventInfo, SingleEvent
+from App.GUI.Note import NotesTable
 
 
 # TO DO button for exits ect
@@ -22,6 +22,7 @@ from App.GUI.Event import EventInfo, SingleEvent, EventAdd
 class ConfirmPopup(Popup):
     def __init__(self, text, function, app=None, **kw):
         super(ConfirmPopup, self).__init__(**kw)
+        
         self.title = ""
         self.size_hint = (.7, .7)
         self.background = ""
@@ -76,167 +77,6 @@ class DayMenu(GridLayout):
         self.add_widget(day_info)
 
 
-class NoteAdd(GridLayout):
-    def __init__(self, app, **kw):
-        super(NoteAdd, self).__init__(**kw)
-        self.cols = 1
-        self.background = ""
-        self.background_color = "#0d1b2a"
-        self.padding = 50
-        self.spacing = 20
-        title = "title"
-        desc = "description"
-
-        self.title = TextInput()
-        self.title.text = title
-        self.add_widget(Label(text="Title", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
-        self.add_widget(self.title)
-
-        self.desc = TextInput()
-        self.desc.text = desc
-        self.add_widget(Label(text="Content", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
-        self.add_widget(self.desc)
-
-        buttons = GridLayout()
-        buttons.cols = 2
-
-        buttons.add_widget(
-            PrimaryButton(text="Accept", on_release=lambda x: self.accept(app), size_hint_y=None, height=100))
-        buttons.add_widget(
-            PrimaryButton(text="Back", on_release=lambda x: self.back(app), size_hint_y=None, height=100))
-
-        self.add_widget(buttons)
-
-    def accept(self, app):
-        # add note
-        app.profile_manager.add_note(self.title.text, self.desc.text)
-
-        self.back(app)
-
-    def back(self, app):
-        app.change_logged_screen("Base")
-
-
-class NoteEdit(GridLayout):
-    def __init__(self, app, id, **kw):
-        super(NoteEdit, self).__init__(**kw)
-
-        self.cols = 1
-        self.padding = 100
-        self.spacing = 20
-        note = app.profile_manager.get_note(id)
-
-        title = note.get_title()
-        description = note.get_text()
-
-        self.title = TextInput()
-        self.title.text = title
-        self.add_widget(Label(text="Title", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
-        self.add_widget(self.title)
-
-        self.short_desc = TextInput()
-        self.short_desc.text = description
-        self.add_widget(Label(text="Content", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
-        self.add_widget(self.short_desc)
-
-        # buttons
-
-        buttons = GridLayout()
-        buttons.cols = 2
-        buttons.add_widget(PrimaryButton(text="Accept", on_release=lambda x: self.accept(app, id, self.title.text,
-                                                                                         self.short_desc.text)))  # TODO: saving changes to temporary json
-        buttons.add_widget(
-            PrimaryButton(text="Cancel", on_release=lambda x: app.change_logged_screen("NoteInfo", id=id)))
-
-        self.add_widget(buttons)
-
-    def accept(self, app, id, title, short_desc):
-        app.profile_manager.set_note(title, short_desc, id)
-        app.change_logged_screen("NoteInfo", id=id)
-
-
-class NoteInfo(GridLayout):
-    def __init__(self, app, id, **kw):
-        super(NoteInfo, self).__init__(**kw)
-
-        self.cols = 1
-        self.padding = 100
-        self.spacing = 20
-        self.note = app.profile_manager.get_note(id)
-
-        title = self.note.get_title()
-        description = self.note.get_text()
-
-        self.add_widget(ColorButton(text=title, font_size='24sp', font_name="Lemonada", background_color="#1b263b"))
-        self.add_widget(ColorButton(text=description, background_color="#1b263b"))
-
-        # buttons
-        buttons = GridLayout()
-
-        buttons.cols = 3
-        buttons.add_widget(PrimaryButton(text="Edit", on_release=lambda x: app.change_logged_screen("NoteEdit", id=id)))
-        buttons.add_widget(PrimaryButton(text="Delete", on_release=lambda x: self.delete(app)))
-        buttons.add_widget(PrimaryButton(text="Cancel", on_release=lambda x: app.change_logged_screen("Base")))
-
-        self.add_widget(buttons)
-
-    def delete(self, app):
-        Factory.ConfirmPopup(text="The data cannot be recovered.", function=self.delete_confirmed, app=app).open()
-
-    def delete_confirmed(self, app):
-        app.profile_manager.delete_note(self.note)
-        app.change_logged_screen("Base")
-
-
-class Note(GridLayout):
-    def __init__(self, app, function, id, note, **kw):
-        super(Note, self).__init__(**kw)
-
-        self.cols = 1
-        self.id = id
-        self.note = note
-
-        self.size_hint_y = None
-        self.height = 70
-
-        self.on_release = function
-
-        title = note.get_title()
-        description = note.get_text()
-
-        self.add_widget(NoteButton(text=title, background_color="#4E496F", bold=True, height=30))
-        self.add_widget(NoteButton(text=description, background_color="#7871AA"))
-
-    def on_touch_down(self, touch):
-        self.on_release("NoteInfo", self.id)
-        return super().on_touch_down(touch)
-
-
-class NotesTable(GridLayout):
-    def __init__(self, app, **kw):
-        super(NotesTable, self).__init__(**kw)
-        self.cols = 1
-        allNotesID = app.profile_manager.get_all_notes_id()
-
-        header = TitleButton(text="Notes", font_name="Lemonada")
-        self.add_widget(header)
-
-        scroll_list = ScrollGrid()
-
-        id = 0
-        for x in allNotesID:
-            scroll_list.add_widget(Note(app=app, function=app.change_logged_screen, id=x,
-                                        note=app.profile_manager.get_note(x)))
-            id += 1
-
-        scroll_view = ScrollView(do_scroll_x=False,
-                                 do_scroll_y=True)
-        scroll_view.add_widget(scroll_list)
-        self.add_widget(scroll_view)
-
-
-
-
 class MenuPanel(BoxLayout):
     def __init__(self, app, **kw):
         super(MenuPanel, self).__init__(**kw)
@@ -248,9 +88,9 @@ class MenuPanel(BoxLayout):
 
         self.dropdown = ActionDropDown(size_hint_x=None, width=200)
         self.dropdown.container.spacing = -3
-        self.dropdown.add_widget(TopButton(text="Save", on_release=lambda x: self.opt1(app)))
-        self.dropdown.add_widget(TopButton(text="Reset", on_release=lambda x: self.opt2(app)))
-        self.dropdown.add_widget(TopButton(text="Back", on_release=lambda x: self.opt3(app)))
+        self.dropdown.add_widget(TopButton(text="Save", on_release=lambda x: self.save_profile(app)))
+        self.dropdown.add_widget(TopButton(text="Reset", on_release=lambda x: self.reset_profile(app)))
+        self.dropdown.add_widget(TopButton(text="Back", on_release=lambda x: self.back(app)))
 
         dropdown_btn = MenuButton()
 
@@ -270,20 +110,20 @@ class MenuPanel(BoxLayout):
         swap_view_button = PrimaryButton(text="Swap view", on_release=lambda _: self.swap_view(app))
         self.add_widget(swap_view_button)
 
-    def opt1(self, app):
+    def save_profile(self, app):
         self.dropdown.dismiss()
         app.profile_manager.save_profile()
         Factory.Message(text="Successfully saved").open()
 
-    def opt2(self, app):
+    def reset_profile(self, app):
         self.dropdown.dismiss()
-        Factory.ConfirmPopup(text="Unsaved data will be lost", function=self.opt2_function, app=app).open()
+        Factory.ConfirmPopup(text="Unsaved data will be lost", function=self.reset_function, app=app).open()
 
-    def opt2_function(self, app):
+    def reset_function(self, app):
         app.profile_manager.load_user_data()
         app.change_logged_screen("Base")
 
-    def opt3(self, app):
+    def back(self, app):
         self.dropdown.dismiss()
         Factory.ConfirmPopup(text="Unsaved data will be lost", function=app.back_to_login).open()
 
@@ -302,11 +142,14 @@ class MenuPanel(BoxLayout):
 class OneDayLayoutClickable(GridLayout):
     def __init__(self, app, day, header=True, **kw):
         super(OneDayLayoutClickable, self).__init__(**kw)
+        
         self.cols = 1
-        self.time = app.profile_manager.actual_date
+        self.time = app.profile_manager.get_date()
+
         scrollable_events = ScrollView(do_scroll_x=False,
                                        do_scroll_y=True)
         scroll_list = ScrollGrid()
+
         if day != -1:
             week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -318,27 +161,37 @@ class OneDayLayoutClickable(GridLayout):
 
             self.time += timedelta(days=day)
 
-        day_ = int(self.time.strftime("%d"))
-        month_ = int(self.time.strftime("%m"))
-        year_ = int(self.time.strftime("%Y"))
+        # date = [day, month, year]
+        date = []
+        date.append(int(self.time.strftime("%d")))
+        date.append(int(self.time.strftime("%m")))
+        date.append(int(self.time.strftime("%Y")))
 
-        day__ = app.profile_manager.get_events_of_day(day_, month_, year_)
+        actual_day = app.profile_manager.get_day(date[0], date[1], date[2])
 
-        if day__ is not None:
-            for x in day__.get_events():
-                scroll_list.add_widget(SingleEvent(app=app, event=x, time=self.time))
+        events = []
+
+        id = 0
+
+        if actual_day is not None:
+            for event in actual_day.get_events():
+                events.append((event["start"], id, SingleEvent(app=app, event=event, time=self.time)))
+                id += 1
+
+        events.sort(reverse=False)
+
+        for event in events:
+            scroll_list.add_widget(event[2])
 
         scrollable_events.add_widget(scroll_list)
 
-        self.swap_function = app.changeBase
-        self.swap_function_2 = app.change_logged_screen
         if header: self.add_header(app)
         self.add_widget(scrollable_events)
 
     def swapFunction(self, app):
         app.profile_manager.actual_date = self.time
-        self.swap_function()
-        self.swap_function_2("Base")
+        app.changeBase()
+        app.change_logged_screen("Base")
 
     def add_header(self, app):
         is_today = (self.time.strftime("%d%m%Y") == datetime.now().strftime("%d%m%Y"))

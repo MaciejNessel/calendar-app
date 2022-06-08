@@ -1,12 +1,32 @@
 {
   "username": "ddda",
-  "eventDetails": [],
-  "noteDetails": [
+  "eventDetails": [
     {
-      "title": "title1",
-      "text": "description1",
-      "id": "0561e27e-e69c-11ec-8eb9-e848b8c82000"
+      "title": "title",
+      "short_desc": "short_desc",
+      "desc": "full desc",
+      "id_": "85df66a1-e6d4-11ec-932e-e848b8c82000",
+      "notes_id": [],
+      "color": [
+        1,
+        0.09999999999999998,
+        0.09999999999999998,
+        1
+      ]
     }
   ],
-  "dataPerDay": []
+  "noteDetails": [],
+  "dataPerDay": [
+    {
+      "date": "2022-06-07",
+      "events": [
+        {
+          "id_": "85df66a1-e6d4-11ec-932e-e848b8c82000",
+          "start": "00:00",
+          "end": "13:00"
+        }
+      ],
+      "notes": []
+    }
+  ]
 }

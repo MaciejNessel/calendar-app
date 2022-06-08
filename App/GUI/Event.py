@@ -55,11 +55,16 @@ class EventInfo(GridLayout):
         super(EventInfo, self).__init__(**kw)
 
         self.cols = 1
-        event_id = app.actualEvent
+        event_id = app.actual_event
         if not event_id or event_id == None:
             return
 
         self.event = app.profile_manager.get_event(event_id)
+
+        actual_date = str(app.profile_manager.get_date()).split(" ")[0]
+
+        if not app.profile_manager.is_event_in_day(event_id=event_id, date=actual_date):
+            return
 
         self.title = self.event.get_title()
         self.short_desc = self.event.get_short_desc()
@@ -81,7 +86,7 @@ class EventInfo(GridLayout):
         self.add_widget(buttons)
 
     def delete(self, app):
-        app.actualEvent = None
+        app.actual_event = None
 
         app.profile_manager.delete_event(self.event)
 
@@ -121,7 +126,7 @@ class SingleEvent(GridLayout):
         self.add_widget(EventButton(text=short_desc, on_release=lambda x: self.onrel(), background_color=color))
 
     def onrel(self):
-        self.app.actualEvent = self.id
+        self.app.actual_event = self.id
         self.app.profile_manager.set_actual_date(self.time)
         self.app.set_base("DayMenu")
         self.app.change_logged_screen("Base")
@@ -189,7 +194,7 @@ class EventAdd(GridLayout):
             end = el.get('end')
             if not (date and start and end):
                 return
-            app.profile_manager.day_manager.add_event_to_day(date=date, event_id=event_id, start=start,
+            app.profile_manager.add_event_to_day(date=date, event_id=event_id, start=start,
                                                              end=end)
         if len(self.dates) < 1:
             Factory.Error(text="Add at least one date").open()
