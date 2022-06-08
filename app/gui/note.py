@@ -1,7 +1,7 @@
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
-from App.GUI.Buttons import PrimaryButton, ColorButton, NoteButton, TitleButton, ScrollGrid
+from app.gui.buttons import PrimaryButton, ColorButton, NoteButton, TitleButton, ScrollGrid
 from kivy.factory import Factory
 from kivy.uix.scrollview import ScrollView
 
@@ -157,7 +157,7 @@ class NotesTable(GridLayout):
         self.cols = 1
         all_notes_ids = app.profile_manager.get_all_notes_id()
 
-        header = TitleButton(text="Notes", font_name="Lemonada")
+        header = TitleButton(text="notes", font_name="Lemonada")
         self.add_widget(header)
 
         scroll_list = ScrollGrid()

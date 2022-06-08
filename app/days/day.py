@@ -1,7 +1,6 @@
-from App.Events.Event import Event
-from App.Notes.Note import Note
 import json
-from App.Json.JsonEncoder import JsonEncoder
+from app.json.json_encoder import JsonEncoder
+
 
 class Day:
     def __init__(self, date, events_, notes):
@@ -11,7 +10,7 @@ class Day:
 
     def add_event_to_day(self, event):
         self.__events.append(event)
-        
+
     def add_note_to_day(self, note):
         self.__notes.add(note)
 
@@ -24,17 +23,18 @@ class Day:
     def delete_event(self, event_id):
         to_remove = None
         for x in self.__events:
-            if x["id_"] == event_id:
+            if x.get("id_", None) == event_id:
                 to_remove = x
                 break
-        
-        if to_remove == None:
+
+        if not to_remove:
             return False
-        
-        self.__events.remove(x)
+
+        self.__events.remove(to_remove)
 
         if len(self.__events) == 0:
             return True
+
         return False
 
     def to_json(self):

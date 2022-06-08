@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from random import randint
 from shutil import copyfile
 
 import requests
@@ -158,7 +159,6 @@ class JsonManager:
             return None
 
     # TODO obslugę dodawania użytkowników o tej samej nazwie - aktualnie dane są nadpisywane!
-    # Przywracanie danych: https://jsonblob.com/api/jsonBlob/967425735073742848
     @staticmethod
     def get_data_from_url(url):
         r = None
@@ -178,8 +178,7 @@ class JsonManager:
 
         return r
 
-    @staticmethod
-    def import_data(url):
+    def import_data(self, url):
         r = JsonManager.get_data_from_url(url)
         if not r:
             return False
@@ -189,18 +188,27 @@ class JsonManager:
             users_file = open(FILES_DIR + "users/users_list.json", "w")
             users_list = {"users": []}
 
-        for user in r.get("users_list", {}):
-            users_list.get('users').append(user)
+
+        for user in r.get("user_data", {}):
+            username = user.get('username')
+            new_username = self.check_nick(username)
+            users_list.get('users').append({'username': new_username})
+            with open(FILES_DIR + "/users/" + new_username + ".json", 'w') as f:
+                json.dump(user, f, indent=2)
 
         with open(FILES_DIR + "/users/users_list.json", 'w') as f:
             json.dump(users_list, f, indent=2)
 
-        for user in r.get("user_data", {}):
-            username = user.get('username')
-            with open(FILES_DIR + "/users/" + username + ".json", 'w') as f:
-                json.dump(user, f, indent=2)
-
         return True
+
+    def check_nick(self, user_id):
+        user_list = self.get_users()
+        for user in user_list:
+            if user.get('username', '') == user_id:
+                user_id += "C"
+                return self.check_nick(user_id)
+
+        return user_id
 
     @staticmethod
     def prepare_data_to_export():

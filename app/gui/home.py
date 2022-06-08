@@ -3,9 +3,9 @@ from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
-from App.Days.DayManager import DayManager
-from App.Events.EventManager import EventsManager
-from App.Notes.NotesManager import NotesManager
+from app.days.day_manager import DayManager
+from app.events.event_manager import EventsManager
+from app.notes.notes_manager import NotesManager
 
 
 class UserManager:

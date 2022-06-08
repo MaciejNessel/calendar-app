@@ -2,12 +2,12 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.uix.screenmanager import ScreenManager, NoTransition, Screen
-from App.GUI.Event import EventAdd
-from App.GUI.Login import Login
-from App.GUI.MenuElements import *
-from App.GUI.Note import NoteAdd, NoteEdit, NoteInfo
-from App.Json.JsonManager import JsonManager
-from App.Profile.ProfileManager import ProfileManager
+from app.gui.event import EventAdd
+from app.gui.login import Login
+from app.gui.menu_elements import *
+from app.gui.note import NoteAdd, NoteEdit, NoteInfo
+from app.json.json_manager import JsonManager
+from app.profile.profile_manager import ProfileManager
 
 
 class MyApp(App):

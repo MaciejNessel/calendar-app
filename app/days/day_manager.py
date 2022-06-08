@@ -1,5 +1,6 @@
-from App.Days.Day import Day
+from app.days.day import Day
 import json
+
 
 class DayManager:
     def __init__(self, json_manager):
@@ -17,12 +18,12 @@ class DayManager:
     # Add Event Id to day
     def add_event_to_day(self, event_id, start, end, date="", day=-1, month=-1, year=-1):
         event_info = {
-                "id_" : event_id,
-                "start": start,
-                "end": end
-            }
+            "id_": event_id,
+            "start": start,
+            "end": end
+        }
 
-        if self.get_day(date=date) == None:
+        if not self.get_day(date=date):
             new_day = Day(date, events_=[], notes=[])
             new_day.add_event_to_day(event=event_info)
             self.__days.update({date: new_day})

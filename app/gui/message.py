@@ -1,13 +1,13 @@
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
-from App.GUI.Buttons import PrimaryButton
+from app.gui.buttons import PrimaryButton
 
 
-class Error(Popup):
+class Message(Popup):
     def __init__(self, text, **kw):
-        super(Error, self).__init__(**kw)
-        self.title = "Error"
+        super(Message, self).__init__(**kw)
+        self.title = "Message"
         self.size_hint = (.7, .7)
         self.background = ""
         self.background_color = "#0d1b2a"

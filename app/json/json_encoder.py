@@ -1,5 +1,6 @@
 from json import JSONEncoder
 
+
 class JsonEncoder(JSONEncoder):
     @staticmethod
     def prepare(text):

@@ -10,10 +10,10 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-from App.GUI.Buttons import PrimaryButton, TopButton, TitleButton, MenuButton, ScrollGrid
+from app.gui.buttons import PrimaryButton, TopButton, TitleButton, MenuButton, ScrollGrid
 
-from App.GUI.Event import EventInfo, SingleEvent
-from App.GUI.Note import NotesTable
+from app.gui.event import EventInfo, SingleEvent
+from app.gui.note import NotesTable
 
 
 # TO DO button for exits ect
@@ -61,7 +61,7 @@ class DayMenu(GridLayout):
         day_info = GridLayout(cols=3, spacing=10)
 
         left = GridLayout(cols=1)
-        left.add_widget(TitleButton(text="Events", font_name="Lemonada"))
+        left.add_widget(TitleButton(text="events", font_name="Lemonada"))
         left.add_widget(OneDayLayoutClickable(app=app, day=day, header=False))
 
         day_info.add_widget(left)

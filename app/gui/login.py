@@ -7,10 +7,10 @@ from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 
-from App.Json.JsonManager import JsonManager
-from App.GUI.Message import Message
-from App.GUI.Error import Error
-from App.GUI.Buttons import PrimaryButton, UsersButton, ScrollGrid
+from app.json.json_manager import JsonManager
+from app.gui.message import Message
+from app.gui.error import Error
+from app.gui.buttons import PrimaryButton, UsersButton, ScrollGrid
 
 
 class SelectUser(Popup):
@@ -195,7 +195,7 @@ class Login(GridLayout):
                                    on_release=lambda x: Factory.ImportData(app).open())
         export_btn = PrimaryButton(text='Export data',
                                    on_release=lambda x: Factory.ExportData(app).open())
-        self.add_widget(Label(text="Calendar App", font_size=50, font_name="Lemonada"))
+        self.add_widget(Label(text="Calendar app", font_size=50, font_name="Lemonada"))
         self.add_widget(select_user_btn)
         self.add_widget(new_user_btn)
         self.add_widget(remove_user_btn)

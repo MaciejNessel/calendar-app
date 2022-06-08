@@ -1,10 +1,10 @@
 import json
-from App.Events.Event import Event
-from App.Events.EventManager import EventsManager
-from App.Notes.Note import Note
-from App.Notes.NotesManager import NotesManager
-from App.Days.DayManager import DayManager
-from App.Json.JsonManager import JsonManager
+from app.events.event import Event
+from app.events.event_manager import EventsManager
+from app.notes.note import Note
+from app.notes.notes_manager import NotesManager
+from app.days.day_manager import DayManager
+from app.json.json_manager import JsonManager
 
 from datetime import datetime, timedelta
 

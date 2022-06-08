@@ -7,7 +7,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 
-from App.GUI.Buttons import PrimaryButton, EventButton, ColorButton, DatesButton, ScrollGrid
+from app.gui.buttons import PrimaryButton, EventButton, ColorButton, DatesButton, ScrollGrid
 import re
 
 

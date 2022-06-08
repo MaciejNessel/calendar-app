@@ -1,5 +1,5 @@
 import json
-from App.Json.JsonEncoder import JsonEncoder
+from app.json.json_encoder import JsonEncoder
 
 class Event:
     def __init__(self, title, short_desc, desc, id_, notes_id, color):
@@ -10,7 +10,7 @@ class Event:
         self.__notes_id = notes_id
         self.__color = color
 
-    # Return Event object in Json format
+    # Return Event object in json format
     def to_json(self):
         return json.dumps(self, cls=JsonEncoder, indent=2)
 

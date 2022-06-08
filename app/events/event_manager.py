@@ -1,5 +1,5 @@
-from App.Events.Event import Event
-from App.Json.JsonManager import JsonManager
+from app.events.event import Event
+from app.json.json_manager import JsonManager
 import json
 
 class EventsManager:
@@ -33,7 +33,7 @@ class EventsManager:
         else:
             return self.__events[id_]
 
-    # Reset Events
+    # Reset events
     def reset(self):
         self.__events.clear()
         self.load()
