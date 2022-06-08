@@ -1,3 +1,4 @@
+import re
 from datetime import date, timedelta, datetime
 
 from kivy.factory import Factory
@@ -50,23 +51,28 @@ class NoteAdd(GridLayout):
     def __init__(self, app, **kw):
         super(NoteAdd, self).__init__(**kw)
         self.cols = 1
-        
+        self.background = ""
+        self.background_color = "#0d1b2a"
+        self.padding = 50
+        self.spacing = 20
         title = "title"
         desc = "description"
 
         self.title = TextInput()
         self.title.text = title
+        self.add_widget(Label(text="Title", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         self.add_widget(self.title)
 
         self.desc = TextInput()
         self.desc.text = desc
+        self.add_widget(Label(text="Content", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         self.add_widget(self.desc)
 
         buttons = GridLayout()
         buttons.cols = 2
 
-        buttons.add_widget(PrimaryButton(text="Accept", on_release= lambda x: self.accept(app)))
-        buttons.add_widget(PrimaryButton(text="Back", on_release=  lambda x: self.back(app)))
+        buttons.add_widget(PrimaryButton(text="Accept", on_release= lambda x: self.accept(app), size_hint_y=None, height=100))
+        buttons.add_widget(PrimaryButton(text="Back", on_release=  lambda x: self.back(app), size_hint_y=None, height=100))
         
         self.add_widget(buttons)
 
@@ -340,13 +346,15 @@ class DateChanger(Popup):
         self.size_hint = (.7, .7)
         self.cols = 1
         self.title = ""
+        self.background=""
+        self.background_color="#0d1b2a"
+        self.title="Go to"
         layout = GridLayout(cols=1,
                             spacing=10,
                             padding=20)
 
         textField = TextInput()
         textField.text = str(app.profile_manager.get_date()).split(" ")[0]
-
         layout.add_widget(textField)
 
         buttonsGrid = GridLayout()
@@ -359,20 +367,26 @@ class DateChanger(Popup):
 
     def accept(self, app, date_):
         self.dismiss()
-        if len(date_.split("-")) != 3:
+
+        if not re.search("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", date_):
+            Factory.Error(text="Wrong date format.").open()
             return
 
-        if len(date_.split("-")[0]) != 4:
+        year = int(date_.split("-")[0])
+        month = int(date_.split("-")[1])
+        day = int(date_.split("-")[2])
+
+        if day > 31 or day < 1:
+            Factory.Error(text="The wrong day number was given").open()
+            return
+        if month > 12 or month < 1:
+            Factory.Error(text="The wrong month number was given").open()
             return
 
-        if len(date_.split("-")[1]) < 1 or len(date_.split("-")[1]) > 2:
-            return
-
-        if len(date_.split("-")[2]) < 1 or len(date_.split("-")[2]) > 2:
-            return
-
-        app.profile_manager.set_actual_date(
-            date(int(date_.split("-")[0]), int(date_.split("-")[1]), int(date_.split("-")[2])))
+        try:
+            app.profile_manager.set_actual_date(date(year, month, day))
+        except ValueError:
+            Factory.Error(text="Day is out of range for month").open()
 
         app.change_logged_screen("Base")
 

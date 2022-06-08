@@ -4,9 +4,10 @@ from kivy.uix.colorpicker import ColorPicker
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 
-from App.GUI.Buttons import PrimaryButton, EventButton, ColorButton, DatesButton
+from App.GUI.Buttons import PrimaryButton, EventButton, ColorButton, DatesButton, ScrollGrid
 import re
 
 
@@ -129,37 +130,46 @@ class SingleEvent(GridLayout):
 class EventAdd(GridLayout):
     def __init__(self, app, **kwargs):
         super(EventAdd, self).__init__(**kwargs)
-        self.color = "black"
+        self.color = "#000000"
         self.cols = 1
         self.spacing = 10
         self.padding = 20
 
-        title = "title"
-        short_desc = "short_desc"
-        desc = "full desc"
-
         self.dates = []
 
         self.title = TextInput(size_hint_y=None, height=40)
-        self.title.text = title
+        self.title.text = "title"
+        self.add_widget(Label(text="Title", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         self.add_widget(self.title)
 
         self.short_desc = TextInput(size_hint_y=None, height=40)
-        self.short_desc.text = short_desc
+        self.short_desc.text = "short_desc"
+        self.add_widget(
+            Label(text="Short description", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         self.add_widget(self.short_desc)
 
         self.desc = TextInput(size_hint_y=None, height=60)
-        self.desc.text = desc
+        self.desc.text = "full desc"
+        self.add_widget(Label(text="Description", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         self.add_widget(self.desc)
 
+        self.add_widget(Label(text="Color", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         color_button = ColorButton(text="Change color", background_color=self.color)
         color_button.bind(on_release=lambda _: self.color_popup(color_button))
         self.add_widget(color_button)
 
+        self.add_widget(Label(text="Dates", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         date_button = PrimaryButton(text="Add date", on_release=lambda _: self.date_popup(app))
-        self.dates_layout = GridLayout(cols=10)
+        self.dates_layout = ScrollGrid(cols=10)
         self.add_widget(date_button)
-        self.add_widget(self.dates_layout)
+        self.add_widget(
+            Label(text="click on a date to delete", font_size='10sp', font_name="Lemonada", size_hint_y=None,
+                  height=15))
+
+        date_layout_scroll = ScrollView(do_scroll_x=False,
+                                        do_scroll_y=True)
+        date_layout_scroll.add_widget(self.dates_layout)
+        self.add_widget(date_layout_scroll)
 
         buttons = GridLayout()
         buttons.cols = 2
@@ -169,6 +179,9 @@ class EventAdd(GridLayout):
         self.add_widget(buttons)
 
     def add(self, app):
+        if not self.data_validation():
+            return
+
         event_id = app.profile_manager.event_manager.add(title=self.title.text, short_desc=self.short_desc.text,
                                                          desc=self.desc.text, color=self.color)
         for el in self.dates:
@@ -198,14 +211,14 @@ class EventAdd(GridLayout):
             self.color = clr_picker.color
             color_button.background_color = self.color
 
-        popup = Popup()
+        popup = Popup(title="Choose color", background="", background_color="#0d1b2a")
         layout = GridLayout(cols=1)
 
         clr_picker = ColorPicker()
         clr_picker.bind(color=self.on_color)
         layout.add_widget(clr_picker)
 
-        set_button = PrimaryButton(text="Accept", on_release=lambda _: set_color())
+        set_button = PrimaryButton(text="Accept", on_release=lambda _: set_color(), size_hint_y=None, height=100)
         layout.add_widget(set_button)
 
         popup.add_widget(layout)
@@ -231,26 +244,33 @@ class EventAdd(GridLayout):
             self.dates_layout.add_widget(dates_button)
             popup.dismiss()
 
-        popup = Popup()
-        layout = GridLayout(cols=1)
+        popup = Popup(title="Add date",  background="", background_color="#0d1b2a")
+        layout = GridLayout(cols=1, spacing=30)
 
         date = TextInput(size_hint_y=None, height=40)
         date.text = str(app.profile_manager.actual_date.strftime("%Y-%m-%d"))
+        layout.add_widget(Label(text="Date", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         layout.add_widget(date)
 
         start = TextInput(size_hint_y=None, height=40)
         start.text = "00:00"
+        layout.add_widget(Label(text="Start hour", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         layout.add_widget(start)
 
         end = TextInput(size_hint_y=None, height=40)
+        layout.add_widget(Label(text="End hour", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         end.text = "00:00"
         layout.add_widget(end)
 
-        accept_button = PrimaryButton(text="Accept", on_release=lambda _: add_date())
-        layout.add_widget(accept_button)
+        buttons_grid = GridLayout(cols=2)
 
-        back_button = PrimaryButton(text="Back", on_release=lambda _: popup.dismiss())
-        layout.add_widget(back_button)
+        accept_button = PrimaryButton(text="Accept", on_release=lambda _: add_date(), size_hint_y=None, height=100)
+        buttons_grid.add_widget(accept_button)
+
+        back_button = PrimaryButton(text="Back", on_release=lambda _: popup.dismiss(), size_hint_y=None, height=100)
+        buttons_grid.add_widget(back_button)
+
+        layout.add_widget(buttons_grid)
 
         popup.add_widget(layout)
         popup.open()
@@ -266,6 +286,21 @@ class EventAdd(GridLayout):
             return False
 
         if start > end:
+            return False
+
+        return True
+
+    def data_validation(self):
+        if len(self.title.text) > 25:
+            Factory.Error(text="The title entered is too long. \n Maximum length: 25").open()
+            return False
+
+        if len(self.short_desc.text) > 50:
+            Factory.Error(text="The short description entered is too long. \n Maximum length: 50").open()
+            return False
+
+        if len(self.desc.text) > 200:
+            Factory.Error(text="The description entered is too long. \n Maximum length: 200").open()
             return False
 
         return True

@@ -111,7 +111,6 @@ kv = """
     spacing: 5
     
 <ColorButton@Button>:
-    size_hint_y: None
     btn_color: .4,.4,.4,.2
     background_normal: ''
     background_down: ''
@@ -124,8 +123,9 @@ kv = """
             size: self.size
             
 <DatesButton@Button>:
+    background_color: 0,0,0,0
     size_hint: None, None
-    
+    height: 60 
 """
 
 

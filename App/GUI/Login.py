@@ -18,7 +18,8 @@ class SelectUser(Popup):
         super(SelectUser, self).__init__(**kw)
         self.app = app
         self.size_hint = (.7, .7)
-        self.background_color = '#0d1b2a'
+        self.background = ""
+        self.background_color = "#0d1b2a"
         layout = GridLayout(cols=1)
         layout.padding = 20
         layout.spacing = 20
@@ -62,7 +63,8 @@ class LoginPopup(Popup):
         layout = GridLayout(cols=1,
                             spacing=10,
                             padding=20)
-
+        self.background = ""
+        self.background_color = "#0d1b2a"
         self.input_field = TextInput(multiline=False)
         layout.add_widget(self.input_field)
 
@@ -83,6 +85,8 @@ class NewUser(LoginPopup):
         self.title = "Create a new user"
         self.main_btn.text = "Confirm"
         self.main_btn.on_release = lambda: self.add(self.input_field.text)
+        self.background = ""
+        self.background_color = "#0d1b2a"
 
     def add(self, text):
         if text == '':
@@ -102,6 +106,8 @@ class ImportData(LoginPopup):
         self.title = "Import data"
         self.main_btn.text = "Import"
         self.main_btn.on_release = lambda: self.import_data(self.input_field.text)
+        self.background = ""
+        self.background_color = "#0d1b2a"
 
     def import_data(self, url):
         if self.app.json_manager.import_data(url):
@@ -119,7 +125,9 @@ class ExportData(LoginPopup):
         self.title = "Export data"
         self.main_btn.text = "Export"
         self.main_btn.on_release = lambda: self.export()
-
+        self.background = ""
+        self.background_color = "#0d1b2a"
+        
     def export(self):
         self.input_field.text = self.app.json_manager.export_data()
 

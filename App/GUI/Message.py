@@ -9,7 +9,8 @@ class Message(Popup):
         super(Message, self).__init__(**kw)
         self.title = "Message"
         self.size_hint = (.7, .7)
-
+        self.background = ""
+        self.background_color = "#0d1b2a"
         self.layout = GridLayout(cols=1)
         self.layout.add_widget(Label(text=text))
 
