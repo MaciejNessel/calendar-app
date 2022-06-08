@@ -144,8 +144,7 @@ class EventAdd(GridLayout):
 
         self.short_desc = TextInput(size_hint_y=None, height=40)
         self.short_desc.text = "short_desc"
-        self.add_widget(
-            Label(text="Short description", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
+        self.add_widget(Label(text="Short description", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         self.add_widget(self.short_desc)
 
         self.desc = TextInput(size_hint_y=None, height=60)

@@ -10,12 +10,39 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-from App.GUI.Buttons import PrimaryButton, UsersButton, TopButton, TitleButton, NoteButton, MenuButton, ScrollGrid
+from App.GUI.Buttons import PrimaryButton, UsersButton, TopButton, TitleButton, NoteButton, MenuButton, ScrollGrid, \
+    ColorButton
 
 from App.GUI.Event import EventInfo, SingleEvent, EventAdd
 
 
 # TO DO button for exits ect
+
+
+class ConfirmPopup(Popup):
+    def __init__(self, text, function, app=None, **kw):
+        super(ConfirmPopup, self).__init__(**kw)
+        self.title = ""
+        self.size_hint = (.7, .7)
+        self.background = ""
+        self.background_color = "#0d1b2a"
+        self.layout = GridLayout(cols=1)
+        self.layout.add_widget(Label(text=text))
+
+        confirm_btn = PrimaryButton(text='Confirm',
+                                    size_hint=(1, .2))
+        if app:
+            confirm_btn.bind(on_release=lambda x: (function(app), self.dismiss()))
+        else:
+            confirm_btn.bind(on_release=lambda x: (function(), self.dismiss()))
+        self.layout.add_widget(confirm_btn)
+
+        back_btn = PrimaryButton(text='Cancel',
+                                 on_release=lambda x: self.dismiss(),
+                                 size_hint=(1, .2))
+        self.layout.add_widget(back_btn)
+
+        self.add_widget(self.layout)
 
 
 class DayMenu(GridLayout):
@@ -26,7 +53,8 @@ class DayMenu(GridLayout):
         self.add_widget(MenuPanel(app=app))
 
         current_date = app.profile_manager.get_date().strftime("%d %B %Y, %A")
-        current_date_label = Label(text=current_date, size_hint_y=None, height=50, font_size='24sp', font_name="Lemonada")
+        current_date_label = Label(text=current_date, size_hint_y=None, height=50, font_size='24sp',
+                                   font_name="Lemonada")
         self.add_widget(current_date_label)
 
         day_info = GridLayout(cols=3, spacing=10)
@@ -46,6 +74,7 @@ class DayMenu(GridLayout):
         day_info.add_widget(right)
 
         self.add_widget(day_info)
+
 
 class NoteAdd(GridLayout):
     def __init__(self, app, **kw):
@@ -71,16 +100,16 @@ class NoteAdd(GridLayout):
         buttons = GridLayout()
         buttons.cols = 2
 
-        buttons.add_widget(PrimaryButton(text="Accept", on_release= lambda x: self.accept(app), size_hint_y=None, height=100))
-        buttons.add_widget(PrimaryButton(text="Back", on_release=  lambda x: self.back(app), size_hint_y=None, height=100))
-        
+        buttons.add_widget(
+            PrimaryButton(text="Accept", on_release=lambda x: self.accept(app), size_hint_y=None, height=100))
+        buttons.add_widget(
+            PrimaryButton(text="Back", on_release=lambda x: self.back(app), size_hint_y=None, height=100))
+
         self.add_widget(buttons)
 
     def accept(self, app):
-        
-        #add note
+        # add note
         app.profile_manager.add_note(self.title.text, self.desc.text)
-
 
         self.back(app)
 
@@ -93,7 +122,8 @@ class NoteEdit(GridLayout):
         super(NoteEdit, self).__init__(**kw)
 
         self.cols = 1
-
+        self.padding = 100
+        self.spacing = 20
         note = app.profile_manager.get_note(id)
 
         title = note.get_title()
@@ -101,10 +131,12 @@ class NoteEdit(GridLayout):
 
         self.title = TextInput()
         self.title.text = title
+        self.add_widget(Label(text="Title", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         self.add_widget(self.title)
 
         self.short_desc = TextInput()
         self.short_desc.text = description
+        self.add_widget(Label(text="Content", font_size='15sp', font_name="Lemonada", size_hint_y=None, height=15))
         self.add_widget(self.short_desc)
 
         # buttons
@@ -128,31 +160,31 @@ class NoteInfo(GridLayout):
         super(NoteInfo, self).__init__(**kw)
 
         self.cols = 1
-
+        self.padding = 100
+        self.spacing = 20
         self.note = app.profile_manager.get_note(id)
-
-        
 
         title = self.note.get_title()
         description = self.note.get_text()
 
-        self.add_widget(Label(text=title))
-        self.add_widget(Label(text=description))
+        self.add_widget(ColorButton(text=title, font_size='24sp', font_name="Lemonada", background_color="#1b263b"))
+        self.add_widget(ColorButton(text=description, background_color="#1b263b"))
 
         # buttons
         buttons = GridLayout()
 
         buttons.cols = 3
         buttons.add_widget(PrimaryButton(text="Edit", on_release=lambda x: app.change_logged_screen("NoteEdit", id=id)))
-        buttons.add_widget(
-            PrimaryButton(text="Delete", on_release=lambda x: self.delete(app)))
+        buttons.add_widget(PrimaryButton(text="Delete", on_release=lambda x: self.delete(app)))
         buttons.add_widget(PrimaryButton(text="Cancel", on_release=lambda x: app.change_logged_screen("Base")))
 
         self.add_widget(buttons)
 
     def delete(self, app):
-        app.profile_manager.delete_note(self.note)
+        Factory.ConfirmPopup(text="The data cannot be recovered.", function=self.delete_confirmed, app=app).open()
 
+    def delete_confirmed(self, app):
+        app.profile_manager.delete_note(self.note)
         app.change_logged_screen("Base")
 
 
@@ -203,6 +235,8 @@ class NotesTable(GridLayout):
         self.add_widget(scroll_view)
 
 
+
+
 class MenuPanel(BoxLayout):
     def __init__(self, app, **kw):
         super(MenuPanel, self).__init__(**kw)
@@ -239,15 +273,19 @@ class MenuPanel(BoxLayout):
     def opt1(self, app):
         self.dropdown.dismiss()
         app.profile_manager.save_profile()
+        Factory.Message(text="Successfully saved").open()
 
     def opt2(self, app):
         self.dropdown.dismiss()
-        app.change_logged_screen("Base")
+        Factory.ConfirmPopup(text="Unsaved data will be lost", function=self.opt2_function, app=app).open()
+
+    def opt2_function(self, app):
         app.profile_manager.load_user_data()
+        app.change_logged_screen("Base")
 
     def opt3(self, app):
         self.dropdown.dismiss()
-        app.back_to_login()
+        Factory.ConfirmPopup(text="Unsaved data will be lost", function=app.back_to_login).open()
 
     def swap_view(self, app):
         app.profile_manager.actual_date = app.profile_manager.actual_date
@@ -346,9 +384,9 @@ class DateChanger(Popup):
         self.size_hint = (.7, .7)
         self.cols = 1
         self.title = ""
-        self.background=""
-        self.background_color="#0d1b2a"
-        self.title="Go to"
+        self.background = ""
+        self.background_color = "#0d1b2a"
+        self.title = "Go to"
         layout = GridLayout(cols=1,
                             spacing=10,
                             padding=20)
@@ -402,14 +440,13 @@ class WeekMenu(GridLayout):
         left_range, right_range = app.profile_manager.get_date_range()
         left_range, right_range = left_range.strftime("%b %d, %Y"), right_range.strftime("%b %d, %Y")
 
-        date_range_label = Label(text=left_range+" - "+right_range, size_hint_y=None, height=50, font_size='24sp', font_name="Lemonada")
+        date_range_label = Label(text=left_range + " - " + right_range, size_hint_y=None, height=50, font_size='24sp',
+                                 font_name="Lemonada")
         self.add_widget(date_range_label)
 
         for x in range(7):
             week_grid.add_widget(OneDayLayoutClickable(app=app, day=x))
 
-
         week_grid.add_widget(NotesTable(app=app))
-
 
         self.add_widget(week_grid)
