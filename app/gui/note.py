@@ -132,18 +132,13 @@ class Note(GridLayout):
         self.note = note
 
         self.size_hint_y = None
-        self.height = 70
-
         self.app = app
 
         title = note.get_title()
         description = note.get_text()
 
-        # Title
-        self.add_widget(NoteButton(text=title, background_color="#4E496F", bold=True, height=30))
-        
-        # Description
-        self.add_widget(NoteButton(text=description, background_color="#7871AA"))
+        self.add_widget(NoteButton(text=title, background_color="#4E496F", bold=True, size_hint_y=.3))
+        self.add_widget(NoteButton(text=description, background_color="#7871AA", size_hint_y=.7))
 
     def on_touch_down(self, touch):
         self.app.change_logged_screen("NoteInfo", self.id)

@@ -88,7 +88,7 @@ kv = """
     background_down: ''
     background_color: 0, 1, 0, 1
     text_size: root.width-cm(0.3), None
-    height: self.texture_size[1]+cm(0.5)
+    height: self.texture_size[1]
     canvas.before:
         Color:
             rgba: self.btn_color
